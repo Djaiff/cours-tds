@@ -27,34 +27,34 @@ knitr::opts_chunk$set(echo = FALSE)
 #
 multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   library(grid)
-
+  
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
-
+  
   numPlots = length(plots)
-
+  
   # If layout is NULL, then use 'cols' to determine layout
   if (is.null(layout)) {
     # Make the panel
     # ncol: Number of columns of plots
     # nrow: Number of rows needed, calculated from # of cols
     layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                    ncol = cols, nrow = ceiling(numPlots/cols))
+                     ncol = cols, nrow = ceiling(numPlots/cols))
   }
-
- if (numPlots==1) {
+  
+  if (numPlots==1) {
     print(plots[[1]])
-
+    
   } else {
     # Set up the page
     grid.newpage()
     pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-
+    
     # Make each plot, in the correct location
     for (i in 1:numPlots) {
       # Get the i,j matrix positions of the regions that contain this subplot
       matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-
+      
       print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
                                       layout.pos.col = matchidx$col))
     }
@@ -150,9 +150,9 @@ On mène une étude sur l'accès à internet en agglomération nantaise. Pour ce
 - Individu statistiques: un foyer nantais ayant accès à internet
 - Échantillon: 1000 foyers nantais ayant accès à internet
 - Variables:
-  
-    - Débits: variable quantitative discrète {1MB/s, 2MB/s, ....}
-    - Opérateur: variable qualitative nominale {orange, SFR, Free, Bouygues Télécom}
+
+- Débits: variable quantitative discrète {1MB/s, 2MB/s, ....}
+- Opérateur: variable qualitative nominale {orange, SFR, Free, Bouygues Télécom}
 
 ## Exemple simplifié
 
@@ -362,9 +362,9 @@ Si on note $Q_p^r$ le quantile $r$ d'ordre $p$ pour une variable, alors:
 - Les quantiles sont ordonnés $Q_p^1 < Q_p^2 < \dots < Q_p^{p-1}$
 - Bien retenir que:
 
-    - les quantiles d'ordre 4 sont appelés **quartiles** ($Q_4^.$)
-    - les quantiles d'ordre 10 sont nommée **déciles** ($Q_{10}^.$)
-    - les quantiles d'ordre 100 sont nommés **centiles** ($Q_{100}^.$)
+- les quantiles d'ordre 4 sont appelés **quartiles** ($Q_4^.$)
+- les quantiles d'ordre 10 sont nommée **déciles** ($Q_{10}^.$)
+- les quantiles d'ordre 100 sont nommés **centiles** ($Q_{100}^.$)
 
 - Le deuxième quartile correspond à la médiane ($m_e = Q_4^2$)
 
@@ -572,7 +572,7 @@ ggplot(data = iris, aes(x = Species, y = Sepal.Length, color = Species)) +
   labs(title = "Données iris (Fisher's or Anderson's)", x = "", y = "Taille de Sépale", color = "Codes couleur") +
   annotate(geom="text", x=2.7, y=4.5, label="Outlier") +
   geom_segment(aes(x = 2.7, y = 4.6, xend = 2.9, yend = 4.8),
-                  arrow = arrow(length = unit(0.2, "cm"))) +
+               arrow = arrow(length = unit(0.2, "cm"))) +
   theme(axis.text.y = element_blank(),
         axis.ticks = element_blank())
 ```
@@ -1002,14 +1002,16 @@ data <- data.frame(x = x, y = dnorm(x))
 ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x < 10, x, 0)), fill = "darkgrey") +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  annotate(geom="text", x=-3, y=.4, label=latex2exp::TeX("$P(-\\infty \\leq Z \\leq +\\infty)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -3, y = .38, xend = 0, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
   ylim(-5e-2, .4) +
   labs(x = "", y = "")
-  
+
 ```
 
 
@@ -1025,16 +1027,18 @@ data <- data.frame(x = x, y = dnorm(x))
 ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x < 1.5, x, 0)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=-3, y=.4, label=latex2exp::TeX("$P(Z \\leq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -3, y = .38, xend = 0, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
   ylim(-5e-2, .4) +
   labs(x = "", y = "")
-  
+
 ```
 
 ## Calcul de probabilité avec la loi normale
@@ -1051,11 +1055,12 @@ data <- data.frame(x = x, y = dnorm(x))
 g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x > 1.5, x, -1.5)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2.5, y = .18, xend = 2.3, yend = .01), arrow = arrow(length = unit(0.2, "cm"))) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
@@ -1066,18 +1071,18 @@ g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x < 1.5, x, 1.5)), fill = "red") +
   geom_area(mapping = aes(x = ifelse(x > 1.5, x, -1.5)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$1 - P(X \\leq a)$", output='character'), 
            parse=TRUE, color = "darkgrey") +
-  geom_segment(aes(x = 2.6, y = 0.18, xend = 2.4, yend = .05),
-                  arrow = arrow(length = unit(0.2, "cm")), color = "darkgrey") +
+  geom_segment(aes(x = 2.5, y = 0.18, xend = 2.3, yend = .05),
+               arrow = arrow(length = unit(0.2, "cm")), color = "darkgrey") +
   annotate(geom="text", x=-3, y=0.2, label=latex2exp::TeX("$P(X \\leq a)$", output='character'), 
            parse=TRUE, color = "red") +
   geom_segment(aes(x = -2.6, y = 0.18, xend = -2.1, yend = .1),
-                  arrow = arrow(length = unit(0.2, "cm")), color = "red") +
+               arrow = arrow(length = unit(0.2, "cm")), color = "red") +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
@@ -1100,13 +1105,14 @@ data <- data.frame(x = x, y = dnorm(x))
 g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x < -1.5, x, -1.5)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=-1.5, y=-.02, label="-a", color = "black") +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
   geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x=-2.5, y=0.2, label=latex2exp::TeX("$P(Z \\leq -a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -2.5, y = .18, xend = -2.3, yend = .01), arrow = arrow(length = unit(0.2, "cm"))) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
@@ -1116,13 +1122,14 @@ g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
 g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x > 1.5, x, 1.5)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=-1.5, y=-.02, label="-a", color = "black") +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
   geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2.5, y = .18, xend = 2.3, yend = .01), arrow = arrow(length = unit(0.2, "cm"))) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
@@ -1145,13 +1152,14 @@ data <- data.frame(x = x, y = dnorm(x))
 g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x > -1.5, x, -1.5)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=-1.5, y=-.02, label="-a", color = "black") +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
   geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
-  annotate(geom="text", x=-2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq -a)$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq -a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2.5, y = .18, xend = 1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
@@ -1161,13 +1169,14 @@ g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
 g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x < 1.5, x, 1.5)), fill = "darkgrey") +
-  annotate(geom="text", x=1.5, y=-.02, label="a", color = "black") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
   geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
-  annotate(geom="text", x=-1.5, y=-.02, label="-a", color = "black") +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
   geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
-  annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\leq a)$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=-2.5, y=0.2, label=latex2exp::TeX("$P(Z \\leq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -2.5, y = .18, xend = -1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
         axis.ticks = element_blank()) +
@@ -1176,6 +1185,10 @@ g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
 
 multiplot(g1, g2, cols = 2)
 ```
+
+## Résumé
+
+![Calcul de probabilité \small \textit{(Extrait du cours de M. Gérin, Paris Ouest 2012-2013)}][normale]
 
 ## Formule de calcul avec une intervalle quelconque
 
@@ -1201,6 +1214,7 @@ ggplot(data = data, mapping = aes(x = x, y = y)) +
   annotate(geom="text", x=0, y=-.02, label="0") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x=3, y=0.2, label=latex2exp::TeX("$P(a \\leq Z \\leq b)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 3, y = .18, xend = 1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
   annotate(geom="text", x=-2.5, y=0.4, label=latex2exp::TeX("\\textbf{cas I}", output='character'), parse=TRUE) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -1227,7 +1241,8 @@ ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_segment(aes(x = -1, y=-1e-2, xend = -1, yend = 1e-2)) +
   annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
-  annotate(geom="text", x=0, y=0.2, label=latex2exp::TeX("$P(-a \\leq Z \\leq b)$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=2, y=0.3, label=latex2exp::TeX("$P(-a \\leq Z \\leq b)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2, y = .28, xend = 0, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
   annotate(geom="text", x=-2.5, y=0.4, label=latex2exp::TeX("\\textbf{cas I et III}", output='character'), parse=TRUE) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -1256,6 +1271,7 @@ ggplot(data = data, mapping = aes(x = x, y = y)) +
   annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
   geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x=-3, y=0.2, label=latex2exp::TeX("$P(-a \\leq Z \\leq -b)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -3, y = .18, xend = -1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
   annotate(geom="text", x=-2.5, y=0.4, label=latex2exp::TeX("\\textbf{cas III}", output='character'), parse=TRUE) +
   theme(axis.text.x = element_blank(),
         axis.text.y = element_blank(),
@@ -1265,10 +1281,6 @@ ggplot(data = data, mapping = aes(x = x, y = y)) +
 
 ```
 
-
-## Résumé
-
-![Calcul de probabilité \small \textit{(Extrait du cours de M. Gérin, Paris Ouest 2012-2013)}][normale]
 
 ## Transformation de la loi normale
 
@@ -1312,7 +1324,7 @@ $\rightarrow$ Rappel: il s'agit de la **normalisation**, cette petite transforma
 <!-- 3. Conséquence pour un intervalle centré en $0$:  -->
 <!-- $$P( -a \leq Z \leq a) = P(Z \leq a) - P(Z \leq -a) = 2P(Z \leq a) - 1$$ -->
 
-## Cas pratique
+## Cas pratique: calcul de probabilité
 
 68\% des observations sont comprises dans l'intervalle $[\bar x - \sigma; \bar x + \sigma]$... Est-ce bien vrai ?
 
@@ -1340,6 +1352,87 @@ P(\bar x - \sigma \leq X \leq \bar x + \sigma) &=& P(- 1\leq Z \leq 1)\\
 $$
 
 Où $Z\sim N(0, 1)$
+
+
+## Calcul de probabilité inversé
+
+Dans certains cas, on ne cherche pas à calculer une probabilité pour un $b$ donné (e.g., $P(Z\leq b)$) mais on cherche $b$ telle que la probabilité soit égale à une certaine valeur:
+
+$$\text{On veut trouver $b$ tel que } P(X\geq b) = \alpha \text{ où } P(|X|\geq b) = \alpha$$
+
+- Dans ce cas, on s'assure que la probabibilité concerne une variable suivant une **loi normale centrée réduite**, puis on regarde dans une des tables
+
+## Calcul de probabilité inversé: table 1
+
+On recherche une une valeur $z$ telle que $P(Z>z)$ avec $Z\sim N(0,1)$:
+
+```{r}
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x = 1.5, y = -.02, label = "z?") +
+  geom_segment(aes(x = 1.5, y = -1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x = 0, y = -.02, label="0") +
+  geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\alpha = P(Z \\geq z)$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 3, y = .18, xend = 2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+
+## Calcul de probabilité inversé: table 2
+
+On recherche une une valeur $z$ telle que $P(|Z|>z)$ avec $Z\sim N(0,1)$:
+
+```{r}
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < -1.5, x, -1.5)), fill = "darkgrey") +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x = -1.5, y = -.02, label = "-z") +
+  geom_segment(aes(x = -1.5, y = -1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x = 1.5, y = -.02, label = "z?") +
+  geom_segment(aes(x = 1.5, y = -1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x = 0, y = -.02, label="0") +
+  geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x = -4, y = .4, label = latex2exp::TeX("$\\alpha = P(|Z| \\geq z)$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = -3, y = .2, label = latex2exp::TeX("$\\alpha/2 = P(Z \\leq -z)$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -3, y = .18, xend = -2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\alpha/2 = P(Z \\geq z)$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 3, y = .18, xend = 2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+
+## Calcul de probabilité inversé
+
+Attention, cette problématique est faussement facile\dots dans la majorité des cas elle nécessite une bonne maîtrise du calcul des probabilités de la loi normale !
+
+### Cas fréquents
+
+- On ne demande pas de trouver $z$ tel que $P(Z\geq z)=\alpha$ mais plutôt $P(Z\leq z)=1 - \alpha$.
+
+- On ne demande pas de trouver $z$ tel que $P(|Z|\geq z)=\alpha$ mais plutôt $P(|Z|\leq z)=1 - \alpha$.
+
+- La probabilité porte sur une variable $X\sim N(\mu, \sigma^2)$. Il faut bien penser à centrer et réduire l'évènement (ce qui se trouve dans la probabilité) e.g., $P(X\leq x) = P(Z\leq \frac{x-\mu}{\sigma})$ où  et $Z\sim N(0, 1)$
 
 
 
