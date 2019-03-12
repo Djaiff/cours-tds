@@ -2,7 +2,7 @@
 title: "Éléments de compréhension des statistiques"
 author: "Jeffery P."
 institute: "Doctorant au Laboratoire des Sciences du Numérique de Nantes (LS2N)"
-date: "Février 2019"
+date: "2019"
 output: 
   beamer_presentation:
     includes:
@@ -62,6 +62,13 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 }
 ```
 
+## Crédits
+
+- Ce support est inspiré du cours de M. Jean-Philippe Babin, responsable pédagogique de Licence à l'Université de Nantes -  Laboratoire de Psychologie des Pays de la Loire.
+
+- Également, plusieurs formulations ont pu être améliorées grâce aux commentaires avisés de M. Paul Marti et M. Damien Schnebelen, tous deux doctorants au LS2N - pôle SIEL, team PACCE.
+
+
 # Statistiques descriptives
 
 ## Préambule
@@ -103,9 +110,9 @@ Peut-on énumérer les modalités sans en omettre ?
 
 Remarque:
 
-- En générale l'énoncé et le contexte nous guident pour déterminer si on est dans le cas discret ou continu
+- En général l'énoncé et le contexte nous guident pour déterminer si on est dans le cas discret ou continu
 - Dans les deux cas, il peut exister une infinité de valeur
-- Une erreur fréquent est de considérer qu'une variable discrète a forcément des modalités entières !
+- Une erreur fréquente est de considérer qu'une variable discrète a forcément des modalités entières !
 
 ## Les variables quantitatives regroupées en classe
 
@@ -176,41 +183,35 @@ Cette question n'est pas anodine, car des données déjà traitées (e.g., list�
 ## Données brutes vs. traitées (exemple)
 
 Données brutes:
-```{r, echo=FALSE}
-data <- data.frame(
-  Individu = c(paste("Foyer", 1:3), "...", "Foyer 1000"),
-  Debit = c(20, 10, 150, '', 75),
-  Operateur = c("Free", "Orange", "SFR", "...", "B&You")
-)
 
-data
-```
+Individu     |Opérateur         | Débit
+-------------|------------------|------------
+Foyer 1      | Free             | 20
+Foyer 2      | Orange           | 10
+$\vdots$     | $\vdots$         | $\vdots$
+Foyer 1000   | SFR              | 75
 
 Données pré-traitées:
 
-```{r, echo=FALSE}
-data <- data.frame(
-  Operateur = c("Free", "Orange", "SFR", "...", "B&You"),
-  Nombre_Foyers = c(95, 330, 120, '', 43),
-  Debit_Moyen = c(20, 10, 150, '', 75)
-)
-
-data
-```
+Opérateur    | Nombre de foyers | Débit moyen
+-------------|------------------|------------
+Free         | 95               | 20
+Orange       |330               | 10
+$\vdots$     | $\vdots$         | $\vdots$
+B&You        | 43               | 75
 
 ## Données brutes vs. traitées (exemple)
 
 Données pré-traitées avec regroupement en classe pour le débit...
 
-```{r, echo=FALSE}
-data <- data.frame(
-  Operateur = c("Free", "Orange", "SFR", "...", "B&You"),
-  Nombre_Foyers = c(95, 330, 120, '', 43),
-  Debit_Moyen = c("[20; 40[", "[0; 20[", "[140; 160[", "", "[60; 80[")
-)
+Opérateur    | Nombre de foyers | Débit moyen
+-------------|------------------|------------
+Free         | 95               | [20; 40[
+Orange       | 330              | [0; 20[
+SFR          | 120              | [140; 160[
+$\vdots$     | $\vdots$         | $\vdots$
+B&You        | 43               | [60; 80[
 
-data
-```
 
 ## Présentation des données en tableau
 
@@ -225,7 +226,7 @@ Pour présenter une variable, nous introduisons quelques notations:
 - $f_{ic}$ ou $\%n_{ic}$: pourcentage cumulé ($f_i=\frac{n_{ic}}{N}$)
 
 
-Quantité     |modalité 1     | modalité 2   | ... | modalité p   | Total
+Quantité      |modalité 1     | modalité 2   | ... | modalité p   | Total
 ------------- | ------------- | ------------ | --- | ------------ |--------
 $n_i$         | 2             | 13           |     |   12         | $N$     
 $n_{ic}$      | 2             | 15           |     |        N     |         
