@@ -1354,8 +1354,13 @@ $$
 
 Où $Z\sim N(0, 1)$
 
+### Remarque
 
-## Calcul de probabilité inversé
+Plus généralement, on a la formule suivante quelque soit $k$ nombre entier positif:
+
+$$P(\bar x - k\times \sigma \leq X \leq \bar x + k\times \sigma) = P(-k\leq Z \leq k)$$
+
+## Calcul des quantiles
 
 Dans certains cas, on ne cherche pas à calculer une probabilité pour un $b$ donné (e.g., $P(Z\leq b)$) mais on cherche $b$ telle que la probabilité soit égale à une certaine valeur:
 
@@ -1363,21 +1368,23 @@ $$\text{On veut trouver $b$ tel que } P(X\geq b) = \alpha \text{ où } P(|X|\geq
 
 - Dans ce cas, on s'assure que la probabibilité concerne une variable suivant une **loi normale centrée réduite**, puis on regarde dans une des tables
 
-## Calcul de probabilité inversé: table 1
+## Calcul des quantiles: table 1
 
 On recherche une une valeur $z$ telle que $P(Z>z)$ avec $Z\sim N(0,1)$:
 
 ```{r}
+library(ggplot2)
 x = seq(-5, 5, length.out = 1e4)
 data <- data.frame(x = x, y = dnorm(x))
 ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x > 1.5, x, 0)), fill = "darkgrey") +
-  annotate(geom="text", x = 1.5, y = -.02, label = "z?") +
+  annotate(geom="text", x = 1.5, y = -.02, label = latex2exp::TeX("$z_{(1-\\alpha)}$?", output='character'), 
+           parse=TRUE) +
   geom_segment(aes(x = 1.5, y = -1e-2, xend = 1.5, yend = 1e-2)) +
   annotate(geom="text", x = 0, y = -.02, label="0") +
   geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
-  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\alpha = P(Z \\geq z)$", output='character'), 
+  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\alpha = P(Z \\geq z_{(1-\\alpha)})$", output='character'), 
            parse=TRUE) +
   geom_segment(aes(x = 3, y = .18, xend = 2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
   ylim(-5e-2, .4) +
@@ -1389,29 +1396,32 @@ ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
 ```
 
 
-## Calcul de probabilité inversé: table 2
+## Calcul des quantiles: table 2
 
 On recherche une une valeur $z$ telle que $P(|Z|>z)$ avec $Z\sim N(0,1)$:
 
 ```{r}
+library(ggplot2)
 x = seq(-5, 5, length.out = 1e4)
 data <- data.frame(x = x, y = dnorm(x))
-ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
+ggplot(data = data, mapping = aes(x = x, y = y)) +
   geom_line() +
   geom_area(mapping = aes(x = ifelse(x < -1.5, x, -1.5)), fill = "darkgrey") +
   geom_area(mapping = aes(x = ifelse(x > 1.5, x, 0)), fill = "darkgrey") +
-  annotate(geom="text", x = -1.5, y = -.02, label = "-z") +
+  annotate(geom="text", x = -1.5, y = -.02, label = latex2exp::TeX("$-z_{(1-\\frac{\\alpha}{2})}$", output='character'), 
+           parse=TRUE) +
   geom_segment(aes(x = -1.5, y = -1e-2, xend = -1.5, yend = 1e-2)) +
-  annotate(geom="text", x = 1.5, y = -.02, label = "z?") +
+  annotate(geom="text", x = 1.5, y = -.02, label = latex2exp::TeX("$z_{(1-\\frac{\\alpha}{2})}$?", output='character'), 
+           parse=TRUE) +
   geom_segment(aes(x = 1.5, y = -1e-2, xend = 1.5, yend = 1e-2)) +
   annotate(geom="text", x = 0, y = -.02, label="0") +
   geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
   annotate(geom="text", x = -4, y = .4, label = latex2exp::TeX("$\\alpha = P(|Z| \\geq z)$", output='character'), 
            parse=TRUE) +
-  annotate(geom="text", x = -3, y = .2, label = latex2exp::TeX("$\\alpha/2 = P(Z \\leq -z)$", output='character'), 
+  annotate(geom="text", x = -3, y = .2, label = latex2exp::TeX("$\\frac{\\alpha}{2}= P(Z \\leq -z_{(1-\\frac{\\alpha}{2})})$", output='character'), 
            parse=TRUE) +
   geom_segment(aes(x = -3, y = .18, xend = -2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
-  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\alpha/2 = P(Z \\geq z)$", output='character'), 
+  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\\\frac{\\alpha}{2} = P(Z \\geq z_{(1-\\frac{\\alpha}{2})})$", output='character'), 
            parse=TRUE) +
   geom_segment(aes(x = 3, y = .18, xend = 2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
   ylim(-5e-2, .4) +
@@ -1423,7 +1433,7 @@ ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
 ```
 
 
-## Calcul de probabilité inversé
+## Calcul des quantiles
 
 Attention, cette problématique est faussement facile\dots dans la majorité des cas elle nécessite une bonne maîtrise du calcul des probabilités de la loi normale !
 
@@ -1433,8 +1443,145 @@ Attention, cette problématique est faussement facile\dots dans la majorité des
 
 - On ne demande pas de trouver $z$ tel que $P(|Z|\geq z)=\alpha$ mais plutôt $P(|Z|\leq z)=1 - \alpha$.
 
-- La probabilité porte sur une variable $X\sim N(\mu, \sigma^2)$. Il faut bien penser à centrer et réduire l'évènement (ce qui se trouve dans la probabilité) e.g., $P(X\leq x) = P(Z\leq \frac{x-\mu}{\sigma})$ où  et $Z\sim N(0, 1)$
+- La probabilité porte sur une variable $X\sim N(\mu, \sigma^2)$. Il faut bien penser à centrer et réduire l'évènement (ce qui se trouve dans la probabilité) e.g., $P(X > x) = P(Z > \frac{x-\mu}{\sigma})$ où  et $Z\sim N(0, 1)$
 
+## Calcul des quantiles
+
+### Exemple général (théorique mais utile!)
+
+Soit $X\sim N(\mu, \sigma)$, on suppose $\alpha\in ]0; 0.5[$ connu. 
+
+\begin{center}\textbf{On cherche $b$ tel que $P(X>b)=\alpha$}\end{center}
+
+Voici les étapes qui nous permettent de trouver la solution:
+
+$$
+\begin{array}{rrcl}
+& P(X>b) &=& \alpha\\
+\Leftrightarrow & P(Z>\frac{b-\mu}{\sigma}) &=& \alpha\\
+\Leftrightarrow & P(Z \leq \frac{b-\mu}{\sigma}) &=& 1- \alpha\\
+\Rightarrow & \frac{b-\mu}{\sigma} &=& z_{(1- \alpha)}\\
+ & \text{Donc}\quad b &=& \mu + \sigma \times z_{(1-\alpha)}
+\end{array}
+$$
+Avec:
+
+- $Z\sim N(0,1)$
+- $z_{(1-\alpha)}$ est le **quantile** d'ordre $(1-\alpha)$ de la loi normale centrée réduite
+
+## Calcul des quantiles
+
+- Rappel sur la position des déciles et quartiles extrêmes
+
+```{r}
+library(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  annotate(geom="text", x = -4, y = .4, 
+           label = latex2exp::TeX("$P(Z \\geq Q_1) = 0.75$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = -4, y = .3, 
+           label = latex2exp::TeX("$P(Z \\geq Q_3) = 0.25$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = 4, y = .4, 
+           label = latex2exp::TeX("$P(Z \\geq D_1) = 0.9$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = 4, y = .3, 
+           label = latex2exp::TeX("$P(Z \\geq D_9) = 0.1$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -1.282, y = -1e-2, xend = -1.282, yend = 1e-2)) +
+  annotate(geom="text", x = -1.282, y = -.02, 
+           label = latex2exp::TeX("$D_1$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 1.282, y = -1e-2, xend = 1.282, yend = 1e-2)) +
+  annotate(geom="text", x = 1.282, y = -.02, 
+           label = latex2exp::TeX("$D_9$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -0.674, y = -1e-2, xend = -0.674, yend = 1e-2)) +
+  annotate(geom="text", x = -0.674, y = -.02, 
+           label = latex2exp::TeX("$Q_1$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 0.674, y = -1e-2, xend = 0.674, yend = 1e-2)) +
+  annotate(geom="text", x = 0.674, y = -.02, 
+           label = latex2exp::TeX("$Q_3$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x = 0, y = -.02,
+           label = latex2exp::TeX("$\\mu$", output='character'), 
+           parse=TRUE) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+## Calcul des quantiles
+
+Soit $X\sim N(\mu, \sigma)$
+
+### Détermination des déciles et quartiles extrêmes
+
+En utilisant la formule précédente, il vient:
+
+$$
+\begin{array}{rrcl}
+& P(X > Q_3) &=& 0.25\\
+\Rightarrow & Q_3 &=& \mu + \sigma \times z_{(0.75)}
+\end{array}
+$$
+$$
+\begin{array}{rrcl}
+& P(X > D_9) &=& 0.1\\
+\Rightarrow & D_9 &=& \mu + \sigma \times z_{(0.9)}
+\end{array}
+$$
+
+
+Pour rappel:
+
+- $Q_3$: troisième quartile
+- $D_9$: neuvième décile
+
+## Calcul des quantiles
+
+Soit $X\sim N(\mu, \sigma)$
+
+### Détermination des déciles et quartiles extrêmes
+
+Pour $D_1$ et $Q_1$, le calcul est un peu __sioux__. Par exemple pour $D_1$, on a:
+
+$$
+\begin{array}{rrcl}
+& P(X>D_1) &=& 0.9\\
+\Leftrightarrow & P(Z>\frac{D_1-\mu}{\sigma}) &=& 0.9 \quad \text{or $\frac{D_1-\mu}{\sigma} < 0$}\\
+\Leftrightarrow & P(Z \leq -\frac{D_1-\mu}{\sigma}) &=& 0.9\\
+\Rightarrow & -\frac{D_1-\mu}{\sigma} &=& z_{(0.9)}\\
+ & \text{Donc}\quad D_1 &=& \mu - \sigma \times z_{(0.9)}
+\end{array}
+$$
+
+## Calcul des quantiles
+
+Soit $X\sim N(\mu, \sigma)$
+
+### Détermination des déciles et quartiles extrêmes
+
+On peut utiliser les formules suivantes pour $D_1$ et $Q_1$:
+
+$$Q_1 = \mu - \sigma \times z_{(0.75)} = 2\times \mu - Q_3$$
+$$D_1 = \mu - \sigma \times z_{(0.9)} = 2\times \mu - D_9$$
+
+
+Avec:
+
+- $Q_1$: premier quartile i.e., $P(X\geq Q_1) = 0.75$
+- $Q_3$: troisième quartile i.e., $P(X \geq  Q_3) = 0.25$
+- $D_1$: premier décile i.e., $P(X \geq D_1) = 0.9$ 
+- $D_9$: neuvième décile i.e., $P(X \geq D_9) = 0.1$
 
 ## Intervalle de confiance: introduction
 
@@ -1448,6 +1595,14 @@ Comment faire pour estimer la vraie moyenne $\mu$ avec les données dont on disp
 
 Une première intuition peut consister à supposer que la vraie moyenne $\mu$ est \og à peu près\fg{} égale à la moyenne de l'échantillon dite empirique i.e., $\bar x$
 
-$$\mu \sim \bar x$$
+$$\text{Estimation ponctuelle : } \mu \sim \bar x$$
+
+Néanmoins, une question que l'on peut se poser est la certitude sur cette estimation...?
+
+
+## Intervalle de confiance: présentation
+
+Un **intervalle de confiance** pour la moyenne $\mu$, de niveau $1-\alpha$ où $\alpha \in ]0;1[$, est un intervalle qui a une probabilité $1-\alpha$ de contenir la vraie valeur de $\mu$.
+
 
 [normale]: summary "Extrait du cours de M. Gérin (Paris Ouest)"
