@@ -1436,6 +1436,18 @@ Attention, cette problématique est faussement facile\dots dans la majorité des
 - La probabilité porte sur une variable $X\sim N(\mu, \sigma^2)$. Il faut bien penser à centrer et réduire l'évènement (ce qui se trouve dans la probabilité) e.g., $P(X\leq x) = P(Z\leq \frac{x-\mu}{\sigma})$ où  et $Z\sim N(0, 1)$
 
 
+## Intervalle de confiance: introduction
 
+Jusqu'ici on a calculé des probabilités sur une loi normale connue.
+
+- Imaginons maintenant que l'on dispose d'un échantillon d'obesrvations que l'on suppose issues d'une loi normale $N(\mu, \sigma^2)$
+
+Comment faire pour estimer la vraie moyenne $\mu$ avec les données dont on dispose ?
+
+## Intervalle de confiance: introduction
+
+Une première intuition peut consister à supposer que la vraie moyenne $\mu$ est \og à peu près\fg{} égale à la moyenne de l'échantillon dite empirique i.e., $\bar x$
+
+$$\mu \sim \bar x$$
 
 [normale]: summary "Extrait du cours de M. Gérin (Paris Ouest)"
