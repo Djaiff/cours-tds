@@ -4,7 +4,7 @@ Aucun prérequis n'est nécessaire excepté un niveau de base en mathématique (
 Le contenu de ce document s'inspire beaucoup d'un cours de M. Jean-Philippe Babin[1] avec qui j'ai collaboré 
 pour des séances de travaux dirigés auprès d'élèves de Licence 1 en Psychologie.
 
-Dans ce support on pourra découvrir quelques notions de statistiques exploratoires 
+Dans ce support on pourra découvrir quelques notions de Statistiques Exploratoire 
 (moyenne, médiane, mode, quantiles, écart-type, etc.).
 Ensuite, la loi normale est présentée avec ses principales caractéristiques et 
 plusieurs méthodes de calcul de probabilité.
