@@ -1,0 +1,846 @@
+---
+title: "Éléments de compréhension des statistiques"
+author: "Jeffery P."
+institute: "Doctorant au Laboratoire des Sciences du Numérique de Nantes (LS2N)"
+date: "2019"
+output: 
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo=FALSE}
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+## Crédits
+
+- Ce support est inspiré du cours de M. Jean-Philippe Babin, responsable pédagogique de Licence à l'Université de Nantes -  Laboratoire de Psychologie des Pays de la Loire.
+
+- Également, plusieurs formulations ont pu être améliorées grâce aux commentaires avisés de M. Paul Marti et M. Damien Schnebelen, tous deux doctorants au LS2N - pôle SIEL, team PACCE.
+
+# La loi normale
+
+## Introduction
+
+S'il y a bien une loi populaire en statistique, il s'agit de la loi normale\dots la célèbre courbe en cloche !
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- seq(from = -4, to = 4, length.out = 1e3)
+y <- dnorm(x)
+sample <- data.frame(x, y)
+ggplot(sample, aes(x = x, y = y)) + 
+  geom_line(colour = 1)+
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+C'est la loi régissant toutes les distributions avec un grand nombre d'observation
+
+## Caractéristiques de la loi normale
+
+- La loi normale est une loi **symétrique, centrée autour de sa moyenne** 
+- La symétrie de la distribution implique que **la médiane est égale à la moyenne**
+- C'est une loi unimodale, **son mode est égale à la moyenne**
+
+## Reconnaître une loi normale
+
+En pratique, on peut supposer une distrbution normale d'après l'histogramme, ou le diagramme en barre
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- rnorm(1e3)
+x_bar <- mean(x)
+sample <- data.frame(obs=x)
+ggplot(sample, aes(x=obs)) + 
+  geom_histogram(aes(y=..density..), binwidth = .25, color = "black", fill=NA) +
+  geom_density(alpha=.2) +
+  geom_segment(aes(x = 0, y = 0, xend = 0, yend = .4), linetype="dashed", size = 1.2) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())+
+  annotate(geom="text", x=0, y=-0.02, label=latex2exp::TeX("$\\bar{x} = m_e = mode$", output='character'), parse=TRUE) +
+  labs(x = "", y = "")
+
+```
+
+
+## Quelques mots sur la loi normale
+
+- La loi normale est définie par deux paramètres:
+
+1. Sa moyenne souvent notée $\mu$ (où $mean$)
+2. Son écart-type notée $\sigma$ (où $sd$ pour "Standard Deviation")
+
+Sa densité de probabilité est la suivante:
+
+$$f(x) = \frac{1}{\sqrt{2\pi \sigma^2}} \times \exp\big(-\frac{(x-\mu)^2}{2\sigma^2}\big)$$
+
+avec une variable $X$ qui suit une loi normale de moyenne $\mu$ et d'écart-type $\sigma$
+
+On note $X\sim \N(\mu, \sigma^2)$
+
+## Illustration de la loi normale
+
+Changer la moyenne d'une loi normale revient à translater la distribution vers la droite ou la gauche
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- seq(from = -4, to = 4, length.out = 1e3)
+y1 <- dnorm(x, mean = -1)
+y2 <- dnorm(x, mean = 0)
+y3 <- dnorm(x, mean = 1)
+sample <- data.frame(x, y1, y2, y3)
+ggplot(reshape2::melt(sample, id = "x"), aes(x = x, y=value, colour=variable)) + 
+  geom_line() +
+  scale_color_manual(labels = c("mean = -1", "mean = 0", "mean = 1"), values = 1:3) +
+  labs(x = "", y = "", color = "Codes couleur") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+``` 
+
+## Illustration de la loi normale
+
+Changer l'écart-type d'une loi normale revient à aplatir ou resserrer sa distribution autour de sa moyenne
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- seq(from = -4, to = 4, length.out = 1e3)
+y1 <- dnorm(x, sd = .5)
+y2 <- dnorm(x, sd = 1)
+y3 <- dnorm(x, sd = 1.5)
+sample <- data.frame(x, y1, y2, y3)
+ggplot(reshape2::melt(sample, id = "x"), aes(x = x, y=value, colour=variable)) + 
+  geom_line() +
+  scale_color_manual(labels = c("sd = .5", "sd = 1", "sd = 1.5"), values = 1:3) +
+  labs(x = "", y = "", color = "Codes couleur") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+``` 
+
+## Propriété intéressante
+
+Si l'on dispose d'observations d'une distribution $\N(\mu, \sigma^2)$ alors:
+
+- 68\% des observations sont comprises dans l'intervalle $[\mu - \sigma; \mu + \sigma]$
+- 95\% des observations sont comprises dans l'intervalle $[\mu - 2\sigma; \mu + 2\sigma]$
+- 99,8\% des observations sont comprises dans l'intervalle $[\mu - 3\sigma; \mu + 3\sigma]$
+
+## Estimation graphique de $\mu$ et $\sigma$
+
+- En pratique on estime $\mu$ en prenant le centre de la distribution, et on déduit $\sigma$ en estimant l'intervalle vert
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(latex2exp)
+set.seed((2019))
+x <- rnorm(1e3)
+sample <- data.frame(obs=x)
+ggplot(sample, aes(x=obs)) + 
+  geom_histogram(aes(y=..density..), binwidth = .25, color = "black", fill = NA) +
+  geom_density(alpha=.2) +
+  geom_segment(aes(x = 0, y = 0, xend = 0, yend = .4), linetype="dashed", size = 1.2) +
+  geom_segment(aes(x = -1, y = 0, xend = -1, yend = .3), linetype="dashed", size = 1.2, color = "darkgreen") +
+  geom_segment(aes(x = 1, y = 0, xend = 1, yend = .3), linetype="dashed", size = 1.2, color = "darkgreen") +
+  annotate(geom="text", x=1, y=.32, label="68%]", color = "darkgreen") +
+  annotate(geom="text", x=-1, y=.32, label="[68%", color = "darkgreen") +
+  geom_segment(aes(x = -2, y = 0, xend = -2, yend = .1), linetype="dashed", size = 1.2, color = "darkblue") +
+  geom_segment(aes(x = 2, y = 0, xend = 2, yend = .1), linetype="dashed", size = 1.2, color = "darkblue") +
+  annotate(geom="text", x=2, y=.12, label="95%]", color = "darkblue") +
+  annotate(geom="text", x=-2, y=.12, label="[95%", color = "darkblue") +
+  geom_segment(aes(x = -3, y = 0, xend = -3, yend = .05), linetype="dashed", size = 1.2, color = "darkred") +
+  geom_segment(aes(x = 3, y = 0, xend = 3, yend = .05), linetype="dashed", size = 1.2, color = "darkred") +
+  annotate(geom="text", x=3, y=.07, label="99,8%]", color = "darkred") +
+  annotate(geom="text", x=-3, y=.07, label="[99,8%", color = "darkred") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  xlab("") +
+  annotate(geom="text", x=0, y=-0.02, label=TeX("$\\bar{x}$", output='character'), parse=TRUE) +
+  annotate(geom='text', x=1, y=-0.02, label=TeX("$\\sigma$", output='character'), parse=TRUE) +
+  annotate(geom='text', x=-1, y=-0.02, label=TeX("$-\\sigma$", output='character'), parse=TRUE) +
+  annotate(geom='text', x=2, y=-0.02, label=TeX("$2\\sigma$", output='character'), parse=TRUE) +
+  annotate(geom='text', x=-2, y=-0.02, label=TeX("$-2\\sigma$", output='character'), parse=TRUE) +
+  annotate(geom='text', x=3, y=-0.02, label=TeX("$3\\sigma$", output='character'), parse=TRUE) +
+  annotate(geom='text', x=-3, y=-0.02, label=TeX("$-3\\sigma$", output='character'), parse=TRUE)
+
+```
+
+
+## Calcul de probabilité: généralité
+
+La probabilité pour qu'une variable aléatoire $X$ soit inférieure à une quelconque valeur $x$ s'écrit $P(X\leq x)$
+
+- \textbf{Un probabilité est toujours positive et inférieure à 1}
+
+
+### Remarque 
+
+- Pour une variable aléatoire réelle on a: $P(-\infty < X < +\infty) = 1$
+- Pour une variable continue, on a $P(X=x) = 0$, d'où:
+$$P(X\leq x) = P(X < x) \text{ où encore } P(X\geq x) = P(X > x)$$
+
+Ce résultat s'explique avec un peu de théorie mathématique que l'on ne détaillera pas ici, mais il peut être utile d'avoir ces propriétés en tête pour les exercices...
+
+<!-- ## Calcul de probabilité: propriétés -->
+
+<!-- Pour $a, b$ réels quelconque avec $a<b$, on a les propriétés suivantes: -->
+
+<!-- $$ -->
+<!-- \begin{array}{rcl} -->
+<!-- P(X\leq b) &=& 1 - P(X>b)\\ -->
+<!-- P(a\leq X \leq b) &=& P(X\leq b) - P(X\leq a)\\ -->
+<!-- \end{array} -->
+<!-- $$ -->
+
+## Calcul de probabilité: lien avec l'aire sous la courbe de densité
+
+**Cas 0**: soit $Z\sim N(0,1)$,  l'aire sous la courbe est égale à 1
+$$P(-\infty < Z < +\infty) = 1$$
+
+```{r, echo=FALSE}
+require(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < 10, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  annotate(geom="text", x=-3, y=.4, label=latex2exp::TeX("$P(-\\infty \\leq Z \\leq +\\infty)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -3, y = .38, xend = 0, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+```
+
+
+## Calcul de probabilité: valeurs de la table
+
+**Cas I**: soient $Z\sim N(0,1)$ et a un nombre réel **positif**
+$$P(Z\leq a) \longrightarrow \text{le résultat se trouve dans la table !}$$
+
+```{r, echo=FALSE}
+require(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=-3, y=.4, label=latex2exp::TeX("$P(Z \\leq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -3, y = .38, xend = 0, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+```
+
+## Calcul de probabilité avec la loi normale
+
+**Cas II**: soient $Z\sim N(0,1)$ et a un nombre réel **positif**
+$$P(Z\geq a) = 1 - P(Z \leq a) \longrightarrow \text{on se ramène au \textbf{cas I}}$$
+
+
+```{r, echo=FALSE}
+library(ggplot2)
+
+x = seq(from = -4, to = 4, length.out = 1e3)
+data <- data.frame(x = x, y = dnorm(x))
+g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, -1.5)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2.5, y = .18, xend = 2.3, yend = .01), arrow = arrow(length = unit(0.2, "cm"))) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < 1.5, x, 1.5)), fill = "red") +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, -1.5)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$1 - P(X \\leq a)$", output='character'), 
+           parse=TRUE, color = "darkgrey") +
+  geom_segment(aes(x = 2.5, y = 0.18, xend = 2.3, yend = .05),
+               arrow = arrow(length = unit(0.2, "cm")), color = "darkgrey") +
+  annotate(geom="text", x=-3, y=0.2, label=latex2exp::TeX("$P(X \\leq a)$", output='character'), 
+           parse=TRUE, color = "red") +
+  geom_segment(aes(x = -2.6, y = 0.18, xend = -2.1, yend = .1),
+               arrow = arrow(length = unit(0.2, "cm")), color = "red") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+multiplot(g1, g2, cols = 2)
+```
+
+## Calcul de probabilité avec la loi normale
+
+**Cas III**: soient $Z\sim N(0,1)$ et a un nombre réel **positif**
+$$P(Z\leq -a) = P(Z \geq a) \longrightarrow \text{on se ramène au \textbf{cas II}}$$
+
+
+```{r, echo=FALSE}
+library(ggplot2)
+x = seq(from = -4, to = 4, length.out = 1e3)
+data <- data.frame(x = x, y = dnorm(x))
+g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < -1.5, x, -1.5)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
+  geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=-2.5, y=0.2, label=latex2exp::TeX("$P(Z \\leq -a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -2.5, y = .18, xend = -2.3, yend = .01), arrow = arrow(length = unit(0.2, "cm"))) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, 1.5)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
+  geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2.5, y = .18, xend = 2.3, yend = .01), arrow = arrow(length = unit(0.2, "cm"))) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+multiplot(g1, g2, cols = 2)
+```
+
+## Calcul de probabilité avec la loi normale
+
+**Cas IV**: soient $Z\sim N(0,1)$ et a un nombre réel **positif**
+$$P(Z\geq -a) = P(Z \leq a) \longrightarrow \text{on se ramène au \textbf{cas I}}$$
+
+
+```{r, echo=FALSE}
+library(ggplot2)
+x = seq(from = -4, to = 4, length.out = 1e3)
+data <- data.frame(x = x, y = dnorm(x))
+g1 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > -1.5, x, -1.5)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
+  geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=2.5, y=0.2, label=latex2exp::TeX("$P(Z \\geq -a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2.5, y = .18, xend = 1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+g2 <- ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < 1.5, x, 1.5)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="a") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a") +
+  geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=-2.5, y=0.2, label=latex2exp::TeX("$P(Z \\leq a)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -2.5, y = .18, xend = -1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+multiplot(g1, g2, cols = 2)
+```
+
+## Résumé
+
+![Calcul de probabilité \small \textit{(Extrait du cours de M. Gérin, Paris Ouest 2012-2013)}][normale]
+
+## Formule de calcul avec une intervalle quelconque
+
+Soient $Z \sim N(0,1)$ et u, v deux nombres réels avec $u\leq v$
+$$P(u \leq Z\leq v) = P(Z \leq v) - P(Z \leq u)$$
+
+## Calcul de probabilité avec la loi normale
+
+**Cas V.1**: soient $Z \sim N(0,1)$ et $0 \leq a\leq b$
+$$P(a \leq Z\leq b) = P(Z \leq b) - P(Z \leq a)$$
+
+```{r, echo=FALSE}
+require(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > 0.5 & x < 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="b") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=.5, y=-.02, label="a") +
+  geom_segment(aes(x = .5, y=-1e-2, xend = .5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=3, y=0.2, label=latex2exp::TeX("$P(a \\leq Z \\leq b)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 3, y = .18, xend = 1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x=-2.5, y=0.4, label=latex2exp::TeX("\\textbf{cas I}", output='character'), parse=TRUE) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+```
+
+## Calcul de probabilité avec la loi normale
+
+**Cas V.2**: soient $Z \sim N(0,1)$ et $0 \leq a\leq b$
+$$P(-a \leq Z\leq b)= P(Z \leq b) - P(Z \leq -a) = P(Z \leq b) + P(Z \leq a) - 1$$
+
+```{r, echo=FALSE}
+require(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > -1 & x < 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x=1.5, y=-.02, label="b", color = "black") +
+  geom_segment(aes(x = 1.5, y=-1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x=-1, y=-.02, label="-a", color = "black") +
+  geom_segment(aes(x = -1, y=-1e-2, xend = -1, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=2, y=0.3, label=latex2exp::TeX("$P(-a \\leq Z \\leq b)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = 2, y = .28, xend = 0, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x=-2.5, y=0.4, label=latex2exp::TeX("\\textbf{cas I et III}", output='character'), parse=TRUE) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+```
+
+## Calcul de probabilité avec la loi normale
+
+**Cas V.3**: soient $Z \sim N(0,1)$ et $-a \leq -b \leq 0$
+$$P(-a \leq Z\leq -b)= P(Z \leq -b) - P(Z \leq -a) = P(Z \leq a) - P(Z \leq b)$$
+
+```{r, echo=FALSE}
+require(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > -1.5 & x < -.5, x, -.5)), fill = "darkgrey") +
+  annotate(geom="text", x=-.5, y=-.02, label="-b", color = "black") +
+  geom_segment(aes(x = -.5, y=-1e-2, xend = -.5, yend = 1e-2)) +
+  annotate(geom="text", x=-1.5, y=-.02, label="-a", color = "black") +
+  geom_segment(aes(x = -1.5, y=-1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x=0, y=-.02, label="0", color = "black") +
+  geom_segment(aes(x = 0, y=-1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x=-3, y=0.2, label=latex2exp::TeX("$P(-a \\leq Z \\leq -b)$", output='character'), parse=TRUE) +
+  geom_segment(aes(x = -3, y = .18, xend = -1, yend = .1), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x=-2.5, y=0.4, label=latex2exp::TeX("\\textbf{cas III}", output='character'), parse=TRUE) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank()) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "")
+
+```
+
+
+## Transformation de la loi normale
+
+Toute transformation _affine_ d'une loi normale est encore une loi normale i.e., quelque soit les nombre réels $a$ et $b\ne 0$ on a:
+
+$$X\sim \N(\mu, \sigma^2) \Rightarrow aX+b\sim \N(\mu+b, a^2\times\sigma^2)$$
+
+Par conséquent:
+
+- si $X\sim \N(\mu, \sigma^2)$ alors $X-\mu \sim \N(0, \sigma^2)$ (**centrage**)
+- si $X\sim \N(\mu, \sigma^2)$ alors $\frac{X}{\sigma} \sim \N(\mu, 1)$ (**réduction**)
+
+En pratique, on fait souvent les deux en même temps:
+
+- si $X\sim \N(\mu, \sigma^2)$ alors $\frac{X-\mu}{\sigma} \sim \N(0, 1)$ (**normalisation=centrage+réduction**)
+
+## Calcul de probabilité: en pratique
+
+Si la variable $X$ ne suite pas une loi normale centrée réduite, on peut toujours se ramener aux cas précédents, par exemple:
+
+$$P(X \leq x) = P(\frac{X-\mu}{\sigma}\leq \frac{x-\mu}{\sigma}) = P(Z \leq \frac{x-\mu}{\sigma})$$
+
+Où $Z\sim \N(0,1)$
+
+$\rightarrow$ Rappel: il s'agit de la **normalisation**, cette petite transformation est très utile et beaucoup utilisée !
+
+
+<!-- ## Résultats utiles pour une loi normal -->
+
+<!-- Soit $Z\sim N(0,1)$. Pour $a, b$ réels positifs tels que $a<b$, on a: -->
+
+<!-- 1. Relation de symétrie:  -->
+<!-- $$P(Z\leq -a) = P(Z \geq a) = 1 - P(Z<a)$$ -->
+<!-- 2. Cas général pour un intervalle: -->
+<!-- $$\begin{array}{r c l} -->
+<!--       P( -a \leq Z \leq b) &=& P(Z \leq b) - P(Z \leq -a) \\ -->
+<!--                            &=& P(Z \leq b) - \big(1 - P(Z \leq a)\big) \\ -->
+<!--                            &=& P(Z \leq b) + P(Z \leq a) - 1 -->
+<!-- \end{array}$$ -->
+
+<!-- 3. Conséquence pour un intervalle centré en $0$:  -->
+<!-- $$P( -a \leq Z \leq a) = P(Z \leq a) - P(Z \leq -a) = 2P(Z \leq a) - 1$$ -->
+
+## Cas pratique: calcul de probabilité
+
+68\% des observations sont comprises dans l'intervalle $[\bar x - \sigma; \bar x + \sigma]$... Est-ce bien vrai ?
+
+$$
+\begin{array}{r c l}
+P(\bar x - \sigma \leq X \leq \bar x + \sigma) &=& P(- \sigma\leq X - \bar x \leq \sigma), \quad \text{on centre}\\
+&=& P(- 1\leq \frac{X - \bar x}{\sigma} \leq 1), \quad\text{on réduit}\\
+&=& P(- 1\leq Z \leq 1)
+\end{array}
+$$
+
+Où $Z\sim N(0, 1)$
+
+Il faut maintenant trouver la valeur de cette probabilité sur les tables...
+
+## Cas pratique
+
+$$
+\begin{array}{r c l}
+P(\bar x - \sigma \leq X \leq \bar x + \sigma) &=& P(- 1\leq Z \leq 1)\\
+&=& P(Z \leq 1) - P(Z \leq -1)\\
+&=& P(Z \leq 1) - (1 - P(Z \leq 1)) \\
+&=& 2P(Z \leq 1) - 1
+\end{array}
+$$
+
+Où $Z\sim N(0, 1)$
+
+### Remarque
+
+Plus généralement, on a la formule suivante quelque soit $k$ nombre entier positif:
+
+$$P(\bar x - k\times \sigma \leq X \leq \bar x + k\times \sigma) = P(-k\leq Z \leq k)$$
+
+## Calcul des quantiles
+
+Dans certains cas, on ne cherche pas à calculer une probabilité pour un $b$ donné (e.g., $P(Z\leq b)$) mais on cherche $b$ telle que la probabilité soit égale à une certaine valeur:
+
+$$\text{On veut trouver $b$ tel que } P(X\geq b) = \alpha \text{ où } P(|X|\geq b) = \alpha$$
+
+- Dans ce cas, on s'assure que la probabibilité concerne une variable suivant une **loi normale centrée réduite**, puis on regarde dans une des tables
+
+## Calcul des quantiles: table 1
+
+On recherche une valeur $z$ telle que $P(Z>z)$ avec $Z\sim N(0,1)$:
+
+```{r}
+library(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot2::ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x = 1.5, y = -.02, label = latex2exp::TeX("$z_{(1-\\alpha)}$?", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 1.5, y = -1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x = 0, y = -.02, label="0") +
+  geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\alpha = P(Z \\geq z_{(1-\\alpha)})$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 3, y = .18, xend = 2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+
+## Calcul des quantiles: table 2
+
+On recherche une une valeur $z$ telle que $P(|Z|>z)$ avec $Z\sim N(0,1)$:
+
+```{r}
+library(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  geom_area(mapping = aes(x = ifelse(x < -1.5, x, -1.5)), fill = "darkgrey") +
+  geom_area(mapping = aes(x = ifelse(x > 1.5, x, 0)), fill = "darkgrey") +
+  annotate(geom="text", x = -1.5, y = -.02, label = latex2exp::TeX("$-z_{(1-\\frac{\\alpha}{2})}$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -1.5, y = -1e-2, xend = -1.5, yend = 1e-2)) +
+  annotate(geom="text", x = 1.5, y = -.02, label = latex2exp::TeX("$z_{(1-\\frac{\\alpha}{2})}$?", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 1.5, y = -1e-2, xend = 1.5, yend = 1e-2)) +
+  annotate(geom="text", x = 0, y = -.02, label="0") +
+  geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x = -4, y = .4, label = latex2exp::TeX("$\\alpha = P(|Z| \\geq z)$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = -3, y = .2, label = latex2exp::TeX("$\\frac{\\alpha}{2}= P(Z \\leq -z_{(1-\\frac{\\alpha}{2})})$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -3, y = .18, xend = -2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
+  annotate(geom="text", x = 3, y = .2, label = latex2exp::TeX("$\\\\frac{\\alpha}{2} = P(Z \\geq z_{(1-\\frac{\\alpha}{2})})$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 3, y = .18, xend = 2, yend = .02), arrow = arrow(length = unit(0.2, "cm"))) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+
+## Calcul des quantiles
+
+Attention, cette problématique est faussement facile\dots dans la majorité des cas elle nécessite une bonne maîtrise du calcul des probabilités de la loi normale !
+
+### Cas fréquents
+
+- On ne demande pas de trouver $z$ tel que $P(Z\geq z)=\alpha$ mais plutôt $P(Z\leq z)=1 - \alpha$.
+
+- On ne demande pas de trouver $z$ tel que $P(|Z|\geq z)=\alpha$ mais plutôt $P(|Z|\leq z)=1 - \alpha$.
+
+- La probabilité porte sur une variable $X\sim N(\mu, \sigma^2)$. Il faut bien penser à centrer et réduire l'évènement (ce qui se trouve dans la probabilité) e.g., $P(X > x) = P(Z > \frac{x-\mu}{\sigma})$ où  et $Z\sim N(0, 1)$
+
+## Calcul des quantiles
+
+### Exemple général (théorique mais utile!)
+
+Soit $X\sim N(\mu, \sigma)$, on suppose $\alpha\in ]0; 0.5[$ connu. 
+
+\begin{center}\textbf{On cherche $b$ tel que $P(X>b)=\alpha$}\end{center}
+
+Voici les étapes qui nous permettent de trouver la solution:
+
+$$
+\begin{array}{rrcl}
+& P(X>b) &=& \alpha\\
+\Leftrightarrow & P(Z>\frac{b-\mu}{\sigma}) &=& \alpha\\
+\Leftrightarrow & P(Z \leq \frac{b-\mu}{\sigma}) &=& 1- \alpha\\
+\Rightarrow & \frac{b-\mu}{\sigma} &=& z_{(1- \alpha)}\\
+ & \text{Donc}\quad b &=& \mu + \sigma \times z_{(1-\alpha)}
+\end{array}
+$$
+Avec:
+
+- $Z\sim N(0,1)$
+- $z_{(1-\alpha)}$ est le **quantile** d'ordre $(1-\alpha)$ de la loi normale centrée réduite
+
+## Calcul des quantiles
+
+- Rappel sur la position des déciles et quartiles extrêmes
+
+```{r}
+library(ggplot2)
+x = seq(-5, 5, length.out = 1e4)
+data <- data.frame(x = x, y = dnorm(x))
+ggplot(data = data, mapping = aes(x = x, y = y)) +
+  geom_line() +
+  annotate(geom="text", x = -4, y = .4, 
+           label = latex2exp::TeX("$P(Z \\geq Q_1) = 0.75$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = -4, y = .3, 
+           label = latex2exp::TeX("$P(Z \\geq Q_3) = 0.25$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = 4, y = .4, 
+           label = latex2exp::TeX("$P(Z \\geq D_1) = 0.9$", output='character'), 
+           parse=TRUE) +
+  annotate(geom="text", x = 4, y = .3, 
+           label = latex2exp::TeX("$P(Z \\geq D_9) = 0.1$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -1.282, y = -1e-2, xend = -1.282, yend = 1e-2)) +
+  annotate(geom="text", x = -1.282, y = -.02, 
+           label = latex2exp::TeX("$D_1$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 1.282, y = -1e-2, xend = 1.282, yend = 1e-2)) +
+  annotate(geom="text", x = 1.282, y = -.02, 
+           label = latex2exp::TeX("$D_9$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = -0.674, y = -1e-2, xend = -0.674, yend = 1e-2)) +
+  annotate(geom="text", x = -0.674, y = -.02, 
+           label = latex2exp::TeX("$Q_1$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 0.674, y = -1e-2, xend = 0.674, yend = 1e-2)) +
+  annotate(geom="text", x = 0.674, y = -.02, 
+           label = latex2exp::TeX("$Q_3$", output='character'), 
+           parse=TRUE) +
+  geom_segment(aes(x = 0, y = -1e-2, xend = 0, yend = 1e-2)) +
+  annotate(geom="text", x = 0, y = -.02,
+           label = latex2exp::TeX("$\\mu$", output='character'), 
+           parse=TRUE) +
+  ylim(-5e-2, .4) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+```
+
+## Calcul des quantiles
+
+Soit $X\sim N(\mu, \sigma)$
+
+### Détermination des déciles et quartiles extrêmes
+
+En utilisant la formule précédente, il vient:
+
+$$
+\begin{array}{rrcl}
+& P(X > Q_3) &=& 0.25\\
+\Rightarrow & Q_3 &=& \mu + \sigma \times z_{(0.75)}
+\end{array}
+$$
+$$
+\begin{array}{rrcl}
+& P(X > D_9) &=& 0.1\\
+\Rightarrow & D_9 &=& \mu + \sigma \times z_{(0.9)}
+\end{array}
+$$
+
+
+Pour rappel:
+
+- $Q_3$: troisième quartile
+- $D_9$: neuvième décile
+
+## Calcul des quantiles
+
+Soit $X\sim N(\mu, \sigma)$
+
+### Détermination des déciles et quartiles extrêmes
+
+Pour $D_1$ et $Q_1$, le calcul est un peu __sioux__. Par exemple pour $D_1$, on a:
+
+$$
+\begin{array}{rrcl}
+& P(X>D_1) &=& 0.9\\
+\Leftrightarrow & P(Z>\frac{D_1-\mu}{\sigma}) &=& 0.9 \quad \text{or $\frac{D_1-\mu}{\sigma} < 0$}\\
+\Leftrightarrow & P(Z \leq -\frac{D_1-\mu}{\sigma}) &=& 0.9\\
+\Rightarrow & -\frac{D_1-\mu}{\sigma} &=& z_{(0.9)}\\
+ & \text{Donc}\quad D_1 &=& \mu - \sigma \times z_{(0.9)}
+\end{array}
+$$
+
+## Calcul des quantiles
+
+Soit $X\sim N(\mu, \sigma)$
+
+### Détermination des déciles et quartiles extrêmes
+
+On peut utiliser les formules suivantes pour $D_1$ et $Q_1$:
+
+$$Q_1 = \mu - \sigma \times z_{(0.75)} = 2\times \mu - Q_3$$
+$$D_1 = \mu - \sigma \times z_{(0.9)} = 2\times \mu - D_9$$
+
+
+Avec:
+
+- $Q_1$: premier quartile i.e., $P(X\geq Q_1) = 0.75$
+- $Q_3$: troisième quartile i.e., $P(X \geq  Q_3) = 0.25$
+- $D_1$: premier décile i.e., $P(X \geq D_1) = 0.9$ 
+- $D_9$: neuvième décile i.e., $P(X \geq D_9) = 0.1$
