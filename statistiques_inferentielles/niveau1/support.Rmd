@@ -1604,5 +1604,113 @@ Néanmoins, une question que l'on peut se poser est la certitude sur cette estim
 
 Un **intervalle de confiance** pour la moyenne $\mu$, de niveau $1-\alpha$ où $\alpha \in ]0;1[$, est un intervalle qui a une probabilité $1-\alpha$ de contenir la vraie valeur de $\mu$.
 
+### Attention
+
+- Cela ne veut pas dire que la vraie valeur $\mu$ à une probabilité $1-\alpha$ d'être dans l'intervalle. Ça n'aurait pas de sens car $\mu$ n'est pas aléatoire!
+
+## Intervalle de confiance: cadre gaussien
+
+Lorsqu'on dispose d'observation d'une distribution supposée gaussienne (disons $N(\mu, \sigma^2)$), on dispose de la vraie loi de la moyenne empirique:
+
+$$\bar X_n \sim N(\mu, \frac{\sigma^2}{n})$$
+
+Ainsi en normalisant (centrage+réduction), on peut déduire que:
+
+$$\sqrt{n}\frac{\bar X_n -\mu}{\sigma} = \frac{\bar X_n -\mu}{\frac{\sigma}{\sqrt{n}}}  \sim N(0, 1)$$
+
+## Intervalle de confiance: rappel sur les quantiles
+
+En reprenant les notation des quantiles de la loi normale i.e. si $Z\sim N(0,1)$ et $\alpha \in ]0.5;1[$, $z_{1-\alpha/2}$ vérifie
+
+$$P(Z\leq z_{(1-\alpha/2)}) = {1-\alpha/2} \quad \text{et}\quad P(Z\leq -z_{(1-\alpha/2)}) = \alpha/2$$
+
+D'où:
+
+$$P(-z_{(1-\alpha/2)} \leq Z\leq z_{(1-\alpha/2)}) = P(|Z|\leq z_{(1-\alpha/2)}) = 1-\alpha$$
+
+## Intervalle de confiance: cadre gaussien
+
+On peut écrire:
+
+$$P(-z_{(1-\alpha/2)} \leq \sqrt{n}\frac{\bar X_n -\mu}{\sigma} \leq z_{(1-\alpha/2)}) = 1-\alpha$$
+
+Ce qui est équvalent à écrire que:
+
+$$P(\bar X_n - \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)} \leq \mu \leq \bar X_n + \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}) = 1 - \alpha$$
+
+## Intervalle de confiance: cadre gaussien
+
+D'après les calculs précédents on peut écrire de manière équivalente :
+
+$$P(\mu \in [\bar X_n - \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}; \bar X_n + \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}]) = 1-\alpha$$
+
+Ce qui nous donne un intervalle de **probabilité** pour la moyenne Eureka !!
+
+La formule de l'intervalle de **confiance** de **niveau $1-\alpha$** pour la moyenne est donc une réalisation de cet intervalle de probabilité compte tenu des données dont on dispose:
+
+$$[\bar x_n - \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}; \bar x_n + \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}]$$
+
+## Intervalle de confiance: écart-type inconnu
+
+La formule précédente ne fonctionne que si on connaît la valeur $\sigma$... ce qui est rarement le cas !
+Dans la pratique, on remplace souvent $\sigma$ par son estimation:
+
+$$\sigma \quad\text{estimé par}\quad s=\sqrt{\frac{1}{n-1}\sum_{i=1}^n (x_i-\bar x_n)^2}$$
+
+Cela change légèrement la loi utilisée car:
+
+$$\sqrt{n}\frac{\bar X_n -\mu}{s} \sim \mathrm{Student}(n-1)$$
+
+On se contente de l'admettre mais cela peut se démontrer avec un peu de théorie statistique\dots ça ne sort pas d'un chapeau !
+
+## Intervalle de confiance: écart-type inconnu
+
+Quand on ne connaît pas l'écart-type de la distribution étudiée, l'intervalle de **confiance** de **niveau $1-\alpha$** pour la moyenne est:
+
+$$[\bar x_n - \frac{\sigma}{\sqrt n} t_{(1-\alpha/2)}; \bar x_n + \frac{\sigma}{\sqrt n} t_{(1-\alpha/2)}]$$
+
+où $t_{1-\alpha/2}$ est le quantile d'ordre $1-\alpha/2$ de la loi de Student à **$n-1$** degrés de liberté
+
+## Intervalle de confiance: écart-type inconnu
+
+Dès que $n-1\geq 30$ on considère que la loi de Student peut être approximée par la loi normale centrée réduite donc:
+$$t_{(1-\alpha/2)} \simeq z_{(1-\alpha/2)}$$
+et par conséquent:
+
+$$[\bar x_n - \frac{\sigma}{\sqrt n} t_{(1-\alpha/2)}; \bar x_n + \frac{\sigma}{\sqrt n} t_{(1-\alpha/2)}]
+\simeq [\bar x_n - \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}; \bar x_n + \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}]$$
+
+## Intervalle de confiance: cadre gaussien
+
+### Remarque
+
+L'intervalle de confiance $[\bar x_n - \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}; \bar x_n + \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}]$ est donc symétrique, centré sur $\bar x_n$. On écrit d'ailleur souvent par abus de notation:
+
+$$[\bar x_n \pm \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)}] \quad \text{ou}\quad [\bar x_n \pm \frac{s}{\sqrt n} t_{(1-\alpha/2)}]$$
+
+On dit souvent que la marge d'erreur est:
+
+$$\varepsilon = \frac{\sigma}{\sqrt n} z_{(1-\alpha/2)} \quad \text{ou}\quad \varepsilon = \frac{s}{\sqrt n} t_{(1-\alpha/2)}$$
+
+## Intervalle de confiance: proportion
+
+Lorsqu'on cherche à estimer une proportion $p_0$, on utilise des formules comparables. Néanmoins, on ne peut formuler un intervalle que lorsque $n$ est suffisamment grand par rapport à $p$ car on doit se contenter de la convergence vers la loi normale:
+
+$$P \underset{n\to \infty}{\longrightarrow} N(\mu=p_0,\sigma^2=\frac{p_0(1-p_0)}{n})$$
+
+## Intervalle de confiance: proportion
+
+On pratique, on vérifie les conditions suivantes:
+
+- $n\geq 3$,
+- $n\times p \geq 5$
+- $n\times (1-p) \geq 5$
+
+Et on estime $\frac{p_0(1-p_0)}{n}$ par $\frac{p(1-p)}{n}$
+
+Ainsi on en déduit l'intervalle de confiance de niveau $1-\alpha$ suivant:
+
+$$[p - \sqrt{\frac{p(1-p)}{n}} z_{(1-\alpha/2)}; p + \sqrt{\frac{p(1-p)}{n}} z_{(1-\alpha/2)}]$$
+
 
 [normale]: summary "Extrait du cours de M. Gérin (Paris Ouest)"
