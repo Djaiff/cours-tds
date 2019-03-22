@@ -1,0 +1,349 @@
+---
+title: "Éléments de compréhension des statistiques"
+author: "Jeffery P."
+institute: "Doctorant au Laboratoire des Sciences du Numérique de Nantes (LS2N)"
+date: "2019"
+output: 
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, echo=FALSE}
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+```
+
+## Crédits
+
+- Ce support est inspiré du cours de M. Jean-Philippe Babin, responsable pédagogique de Licence à l'Université de Nantes -  Laboratoire de Psychologie des Pays de la Loire.
+
+- Également, plusieurs formulations ont pu être améliorées grâce aux commentaires avisés de M. Paul Marti et M. Damien Schnebelen, tous deux doctorants au LS2N - pôle SIEL, team PACCE.
+
+
+# Statistiques descriptives
+
+## Préambule
+
+La statistique descriptive nous permet de décrire l'ensemble des données receuillies
+
+- Individu statistique: unité élémentaire pour laquelle on va receuillir les données
+- Population: ensemble des individus statistiques
+- Échantillon: sous-ensemble de la population
+- Variable ou caractère: aspect auquel on s'intéresse
+
+$\rightarrow$ l'effectif est le nombre d'individus statistiques auquels on s'intéresse, on le note en général $\N$
+
+## Variables et Catégories
+
+Une variable peut prendre un nombre fini ou infini de valeurs que l'on nomme __modalités__
+
+Il existe deux grands types de variable:
+
+- Les variables **qualitatives**: les modalités sont des mots/expressions
+- Les variables **quantitatives**: les modalités sont des nombres entiers ou décimaux
+
+Pour chacun de ces deux grands types, il existe deux sous-catégories...
+
+
+## Les variables qualitatives
+
+Peut-on ordonner (hiérarchiser) les modalités ?
+
+- oui: il s'agit d'une variable **qualitative ordinale** (e.g., type de logement {appartement/maison})
+- non: il s'agit d'une variable **qualitative nominale** (e.g., fréquentation {rare < occasionnelle < souvent})
+
+## Les variables quantitatives
+
+Peut-on énumérer les modalités sans en omettre ?
+
+- oui: il s'agit d'une variable **quantitative discrète** (e.g., âge en année(s) $[1, 2, 3, 4, 5, \dots]$)
+- non: il s'agit d'une variable **quantitative continue** (e.g., taille en cm (précision supposée infinie) [toute valeur supérieure à 0])
+
+Remarque:
+
+- En général l'énoncé et le contexte nous guident pour déterminer si on est dans le cas discret ou continu
+- Dans les deux cas, il peut exister une infinité de valeur
+- Une erreur fréquente est de considérer qu'une variable discrète a forcément des modalités entières !
+
+## Les variables quantitatives regroupées en classe
+
+Lorsqu'on étudie une variable quantitative disposant d'un trop grand nombre de modalités, il est souvent utile de faire un découpage en classe, i.e. on ordonne les modalités et on opère des regroupements (de même amplitude si possible)
+
+$\rightarrow$ on appelle cela **regroupement en classe**
+
+- Un regroupement en classe implique forcément une perte d'information
+- Une variable pour laquelle on aura effectué un regroupement en classe nécessitera un traitement différent (calcul du mode, de la moyenne, de l'écart-type, etc.)
+
+## Les variables quantitatives regroupées en classe
+
+- Une classe est définie par sa borne inférieure ($B_{inf}$) et sa borne supérieure ($B_{sup}$)
+
+- Les classe sont, dans la majorité des cas, des intervalles fermés à gauche et ouvert à droite i.e., une classe contient sa plus petite valeur ($B_{inf}$) mais pas sa plus grande ($B_{sup}$), on note $[B_{inf}; B_{sup}[$
+
+Par exemple $[0; 20[$ mais pas $[0; 20]$ ou $]0; 20[$
+
+- Pour chacune des classe de regroupement, on nomme **amplitude** la longueur de l'intervalle correspondant soit $B_{sup} -B_{inf}$. On la note souvent $a$
+
+Par exemple un intervalle $[0; 20[$ à une amplitude de 20
+
+- À chacune des classes, on associe un effectif souvent noté $n$ et on nomme **densité** la valeur $\frac{n}{a}$
+
+
+## Première étape de description
+
+La première fois que l'on aborde un problème il faut nécessairement trouver les réponses aux questions suivantes:
+
+- Quelle est la population étudiée ?
+- Qu'est-ce qu'un individu statistique ?
+- Quel est l'échantillon ? quel est son effectif ?
+- Quelles sont les variables ? pour chacune, à quelle catégorie appartient-elle et quelles sont les modalités ?
+
+## Exemple simplifié
+
+### Cas général
+
+On mène une étude sur l'accès à internet en agglomération nantaise. Pour cela on enquête auprès de 1000 foyers judicieusement choisis qui ont accès à internet. Pour chacun, on demande leur débit (MB/s) ainsi que leur opérateur.
+
+- Population: ensemble des foyers en agglomération nantaise qui ont accès à internet
+- Individu statistiques: un foyer nantais ayant accès à internet
+- Échantillon: 1000 foyers nantais ayant accès à internet
+- Variables:
+
+- Débits: variable quantitative discrète {1MB/s, 2MB/s, ....}
+- Opérateur: variable qualitative nominale {orange, SFR, Free, Bouygues Télécom}
+
+## Exemple simplifié
+
+### Remarques
+
+Le débit peut tout aussi bien être une variable quantitative discrète regroupée en classe.
+
+- On peut faire des classes d'amplitude égale à 20 ($a=20$): $\{[0; 20[, [20; 40[, [40; 60[, \dots\}$
+- On peut faire des classes d'amplitude inégales: $\{[0; 20[, [20; 80[, [80; 150[, \dots\}$
+
+## Deuxième étape de description
+
+La deuxième étape de description concerne une approche par variable. Pour chacune d'elle nous allons disposer de données receuillies pour les individus statistiques de l'échantillon
+
+Il est souvent utile d'aborder chacune des variables en déterminant si l'on dispose de données brutes ou non ?
+
+$\rightarrow$ Pour une variable, les données sont dites **brutes** si on dispose d'une valeur pour chacun des individus statistiques, sinon on dit qu'elles sont **traitées**
+
+Cette question n'est pas anodine, car des données déjà traitées (e.g., listées en tableau ordonné) orientent le lecteur vers des premières conclusions
+
+## Données brutes vs. traitées (exemple)
+
+Données brutes:
+
+Individu     |Opérateur         | Débit
+-------------|------------------|------------
+Foyer 1      | Free             | 20
+Foyer 2      | Orange           | 10
+$\vdots$     | $\vdots$         | $\vdots$
+Foyer 1000   | SFR              | 75
+
+Données pré-traitées:
+
+Opérateur    | Nombre de foyers | Débit moyen
+-------------|------------------|------------
+Free         | 95               | 20
+Orange       |330               | 10
+$\vdots$     | $\vdots$         | $\vdots$
+B&You        | 43               | 75
+
+## Données brutes vs. traitées (exemple)
+
+Données pré-traitées avec regroupement en classe pour le débit...
+
+Opérateur    | Nombre de foyers | Débit moyen
+-------------|------------------|------------
+Free         | 95               | [20; 40[
+Orange       | 330              | [0; 20[
+SFR          | 120              | [140; 160[
+$\vdots$     | $\vdots$         | $\vdots$
+B&You        | 43               | [60; 80[
+
+
+## Présentation des données en tableau
+
+Pour présenter une variable, nous introduisons quelques notations:
+
+- (rappel) $\N$: effectif total i.e., nombre d'individus statistiques
+- $p$: nombre de modalités associés à la variable
+
+- $n_i$: effectif d'une modalité
+- $n_{ic}$: effectif cumulé i.e, somme cumulée des $n_i$
+- $f_{i}$ ou $\%n_i$: pourcentage d'effectif d'une modalité ($f_i=\frac{n_i}{\N}$)
+- $f_{ic}$ ou $\%n_{ic}$: pourcentage cumulé ($f_i=\frac{n_{ic}}{\N}$)
+
+
+Quantité      |modalité 1     | modalité 2    | ... | modalité p    | Total
+------------- | ------------- | ------------  | --- | ------------- |--------
+$n_i$         | 2             | 13            |     |   12          | $\N$     
+$n_{ic}$      | 2             | 15            |     |     $\N$      |         
+$f_i$         |$\frac{2}{\N}$ |$\frac{13}{\N}$|     |$\frac{12}{\N}$| 1 
+$f_{ic}$      |$\frac{2}{\N}$ |$\frac{15}{\N}$|     |  1            | 1 
+
+## Calcul du mode
+
+Le mode est associé à une variable, il correspond à la **modalité** ayant l'effectif maximum. Il existe quelque soit la catégorie d'une variable
+
+- Une erreur fréquente est de confondre mode et effectif associé !
+- Pour une variable quantitative regroupée en classe, le mode correspond à la classe de densité maximale ($\frac{n}{a}$). Si toutes les classes sont d'amplitudes égales, le mode sera alors la classe d'effectif maximum
+
+## Calcul du mode: exemple
+
+Imaginons une variable avec trois modalités, et un effectif total $\N=12$:
+
+Quantité     |modalité 1     | modalité 2   | modalité 3   
+------------- | ------------- | ------------ | ------------
+$n_i$         | 2             | 3            |   7         
+
+- Le mode est donc la modalité 3
+
+## Calcul de la médiane
+
+La médiane est la modalité qui sépare la population en deux groupes d'effectifs égaux, on la note $m_e$. En pratique:
+
+1. On calcule le range médian i.e., le rang pour lequel on a autant d'individus au dessus qu'en dessous: $$range(m_e)=(\N+1)/2$$
+2. On recherche la modalité qui contient le rang médian
+
+## Calcul de la médiane: remarques
+
+- Le rang médian ne correspond pas tout le temps à un entier. Si l'effectif total est pair le rang médian sera toujours décimal, il correspondra à un individu fictif
+- Une erreur fréquente est de confondre la médiane avec le rang médian associé !
+- Il est souvent pratique d'organiser les données en tableau pour déterminer la médiane, on cherche alors le rang sur **la ligne d'effectif cumulé**
+
+
+## Calcul de la médiane: exemple
+
+Imaginons une variable avec trois modalités, et un effectif total $\N=12$:
+
+Quantité     |modalité 1     | modalité 2   | modalité 3   
+------------- | ------------- | ------------ | ------------
+$n_i$         | 2             | 3            |   7         
+$n_{ic}$      | 2             | 5            |   12           
+
+- Le rang médian est alors $rang(m_e) = (\N+1)/2=(12+1)/2=13/2=6,5$
+- La médiane est donc la modalité 3
+
+## Calcul de la moyenne
+
+C'est une modalité (possiblement fictive) moyenne on la note $\bar x$. Elle n'est pertinente **que pour les variables quantitatives** et se calcule différemment en fonction de 3 situations:
+
+1. Les donnés sont brutes: $$\bar x = \frac{\sum x_i}{\N}$$
+2. Les données sont présentéss en tableau avec effectifs: $$\bar x = \frac{1}{\N}\sum x_i\times n_i$$
+3. Les données sont présentées en tableau et la variable a été regroupée en classe: $$\bar x = \frac{1}{\N}\sum c_i\times n_i$$
+
+### Notations
+
+- $x_i$ représente une modalité
+- $c_i = (B_{inf}^i + B_{sup}^i) /2$ est le centre d'une classe $i$
+
+## Calcul de la moyenne: exemple situation 1
+
+Imaginons un échantillon de trois individus, pour lesquels on dispose du poids (kg):
+
+Individu     |         1     |      2       |   3
+------------- | ------------- | ------------ | ------------
+Modalité      | 68            | 76           |  72   
+
+
+- La moyenne est alors $\bar x = \sum x_i / \N = (68 + 76 + 72) / 3 = 72$
+
+
+## Calcul de la moyenne: exemple situation 2
+
+Imaginons un échantillon de 12 individus, pour lesquels on dispose du poids (kg):
+
+Poids         |        68     |      72      |   76
+------------- | ------------- | ------------ | ------------
+$n_i$         | 5             | 2            |  5   
+
+
+- La moyenne est alors $\bar x = \sum \frac{x_i \times n_i}{\N} = (68 \times 5 + 72 \times 2 + 76 \times 5) / 12 = 72$
+
+## Calcul de la moyenne: exemple situation 3
+
+Imaginons un échantillon de 12 individus, pour lesquels on dispose du poids (kg):
+
+Poids         |  [68; 72[     | [72; 76[     |   [76; 80[  
+------------- | ------------- | ------------ | ------------
+$c_i$         | 70            | 74           | 78   
+$n_i$         | 5             | 2            |  5   
+
+
+- La moyenne est alors $\bar x = \sum \frac{c_i \times n_i}{\N} = (70\times 5 + 74 \times 2 + 78 \times 5) / 12 = 74$
+
+# Quantilage
+
+```{r child="quantilage.Rmd"}
+```
+
+
+# Dispersion d'une distribution
+
+```{r child="dispersion.Rmd"}
+```
+
+
+# La loi normale
+
+```{r child="loi_normale.Rmd"}
+```
+
+
+# Introduction sur les intervalles de Confiance
+
+```{r child="IC.Rmd"}
+```
+

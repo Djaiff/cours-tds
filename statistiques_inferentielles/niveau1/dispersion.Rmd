@@ -1,0 +1,288 @@
+---
+title: "Éléments de compréhension des statistiques"
+author: "Jeffery P."
+institute: "Doctorant au Laboratoire des Sciences du Numérique de Nantes (LS2N)"
+date: "2019"
+output: 
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+
+## Boites de dispersion
+
+En statistique, il est souvent utile de visualiser les distributions.
+
+On peut par exemple tracer des **boites de dispersion** (en anglais **boxplot**). Pour cela, on représente:
+
+- Un rectangle délimité par les 1er et 3ème quartiles ($Q_1$ et $Q_3$)
+- La médiane ($Q_2$) à l'intérieur de ce rectangle
+- Un segment inférieur jusqu'au 1er décile ($D_1$), ou jusqu'au minimum
+- Un segment supérieur jusqu'au 9ème décile ($D_9$), ou jusqu'au maximum
+
+## Boites de dispersion
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(latex2exp)
+ggplot(data = iris[which(iris$Species == "setosa"), ], aes(x = Species, y = Sepal.Length)) + 
+  geom_dotplot(binaxis='y', stackdir='centerwhole', binwidth = .03) +
+  coord_flip() +
+  labs(x = "", y = "", title = "Données iris (Fisher's or Anderson's)") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+## Boites de dispersion
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(latex2exp)
+ggplot(data = iris[which(iris$Species == "setosa"), ], aes(x = Species, y = Sepal.Length)) + 
+  geom_dotplot(binaxis='y', stackdir='centerwhole', binwidth = .03) +
+  coord_flip() +
+  labs(x = "", y = "", title = "Données iris (Fisher's or Anderson's)") +
+  annotate(geom="text", x=0.95, y=4.3, label=TeX("$\\min$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.95, y=5.8, label=TeX("$\\max$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.8, y=4.8, label=TeX("$Q_1$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.8, y=5.2, label=TeX("$Q_3$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.8, y=5, label=TeX("$Q_2 = m_e$", output='character'), parse=TRUE) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+## Boites de dispersion
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(latex2exp)
+ggplot(data = iris[which(iris$Species == "setosa"), ], aes(x = Species, y = Sepal.Length)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', stackdir='centerwhole', binwidth = .03) +
+  coord_flip() +
+  labs(x = "", y = "", title = "Données iris (Fisher's or Anderson's)") +
+  annotate(geom="text", x=0.95, y=4.3, label=TeX("$\\min$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.95, y=5.8, label=TeX("$\\max$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.6, y=4.8, label=TeX("$Q_1$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.6, y=5.2, label=TeX("$Q_3$", output='character'), parse=TRUE) +
+  annotate(geom="text", x=0.6, y=5, label=TeX("$Q_2 = m_e$", output='character'), parse=TRUE) +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+## Boites de dispersion: quelques intérêts
+
+Grâce aux boites de dispersion, on peut rapidement avoir une idée de la répartition des données
+
+- Appréhender l'échelle
+- Savoir si les données sont rassemblées autour de la médiane ou dispersées\dots
+
+De plus, les boites de dispersion permettent de comparer plusieurs distributions entre elles !
+
+## Boites de dispersion
+
+```{r, echo=FALSE}
+library(ggplot2)
+ggplot(data = iris, aes(x = Species, y = Sepal.Length, color = Species)) + 
+  geom_boxplot() +
+  # scale_color_manual(labels = c("mean = -1", "mean = 0", "mean = 1"), values = 1:3) +
+  labs(title = "Données iris (Fisher's or Anderson's)", x = "", y = "Taille de Sépale", color = "Codes couleur") +
+  annotate(geom="text", x=2.7, y=4.5, label="Outlier") +
+  geom_segment(aes(x = 2.7, y = 4.6, xend = 2.9, yend = 4.8),
+               arrow = arrow(length = unit(0.2, "cm"))) +
+  theme(axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+
+## Mesure de dispersion
+
+Que pensez vous des deux courbes suivantes ?
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- seq(from = -4, to = 4, length.out = 1e3)
+y1 <- dnorm(x, sd = 1)
+y2 <- dnorm(x, sd = 1/2)
+sample <- data.frame(x, y1, y2)
+ggplot(sample, aes(x = x)) + 
+  geom_line(aes(y = y1), color = 1) +
+  geom_line(aes(y = y2), color = 2) +
+  labs(x = "", y = "") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+```
+
+## Mesure de dispersion
+
+En statistique la dispersion se nomme **variance**. Il s'agit d'une valeur strictement positive qui ne se calcule que pour des variables **quantitatives**
+
+- La dispersion traduit le fait que les données sont plus ou moins resserrées autour de la valeur moyenne $\bar \x$
+- Plus la variance est élevée, plus les données seront éloignées de leur moyenne (i.e., plus l'histogramme sera aplati)
+- La variance est nulle si toutes les observations ont la même valeur
+
+## Mesure de dispersion: illustration
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- seq(from = -4, to = 4, length.out = 1e3)
+y1 <- dnorm(x, sd = 1)
+y2 <- dnorm(x, sd = 1/2)
+y3 <- dnorm(x, sd = 1/3)
+sample <- data.frame(x, y1, y2, y3)
+ggplot(reshape2::melt(sample, id = "x"), aes(x = x, y=value, colour=variable)) + 
+  geom_line() +
+  geom_segment(aes(x = 0, y = 0, xend = 0, yend = 1.2), color = "darkblue", linetype = "dashed") +
+  scale_color_manual(labels = c("sd = 1", "sd = 1/2", "sd = 1/3"), values = 1:3) +
+  annotate(geom="text", x=0, y=-.02, label=TeX("moyenne", output='character'), color = "darkblue", parse=TRUE) +
+  labs(x = "", y = "", title = "Lois normales", color = "Codes couleur") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+``` 
+
+## Mesure de dispersion: illustration
+
+```{r, echo=FALSE}
+library(ggplot2)
+set.seed((2019))
+x <- seq(from = 0, to = 5, length.out = 1e3)
+y1 <- dexp(x, rate = 1)
+y2 <- dexp(x, rate = 2)
+y3 <- dexp(x, rate = 3)
+sample <- data.frame(x, y1, y2, y3)
+ggplot(reshape2::melt(sample, id = "x"), aes(x = x, y=value, colour=variable)) + 
+  geom_line() +
+  geom_segment(aes(x = 1, y = 0, xend = 1, yend = .5), color = 1, linetype = "dashed") +
+  annotate(geom="text", x=1, y=-.05, label=TeX("$\\m_1 = 1$", output='character'), color = 1, parse=TRUE) +
+  geom_segment(aes(x = 1/2, y = 0, xend = 1/2, yend = 1), color = 2, linetype = "dashed") +
+  annotate(geom="text", x=.85, y=0.8, label=TeX("$\\m_2 = 1/2$", output='character'), color = 2, parse=TRUE) +
+  geom_segment(aes(x = 1/3, y = 0, xend = 1/3, yend = 1.5), color = 3, linetype = "dashed") +
+  annotate(geom="text", x=.7, y=1.5, label=TeX("$\\m_3 = 1/3$", output='character'), color = 3, parse=TRUE) +
+  scale_color_manual(labels = c("sd = 1", "sd = 1/2", "sd = 1/3"), values = 1:3) +
+  labs(x = "", y = "", title = "Lois exponentielles", color = "Codes couleur") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+``` 
+
+## Le calcul de la variance d'observation
+
+La variance d'**observation** se note souvent $\sigma^2$ ou $\var$. Elle se calcule différemment en fonction des cas:
+
+1. Sur données brutes:
+
+$$ \sigma^2 = \frac{1}{\N}\sum (\x_i - \bar \x) ^2 $$
+
+2. Sur données traitées avec effectif:
+
+$$ \sigma^2 = \frac{1}{\N}\sum n_i(\x_i - \bar \x) ^2 $$
+
+3. Sur données traitées regroupées en classes :
+
+$$ \sigma^2 = \frac{1}{\N}\sum n_i(c_i - \bar \x) ^2 $$
+
+
+## Éléments de compréhension de la variance
+
+Exemple sur données brutes:
+
+$$ \sigma^2 = \frac{1}{\N}\sum (\x_i - \bar \x) ^2 $$
+
+Pour obtenir la variance:
+
+1. On calcule les écarts entre chaque observation et la valeur moyenne
+2. On élève tous ces écarts au carré (puissance 2)
+3. On calcule la moyenne des valeurs observées
+
+## Éléments de compréhension de la variance
+
+On peut montrer que:
+
+$$ \sigma^2 = \frac{1}{\N}\sum (\x_i - \bar \x) ^2 = \frac{1}{\N}\sum \x_i^2 - {\bar \x}^2$$
+
+Ou encore:
+
+$$ \sigma^2 = \bar{\x^2} - {\bar \x}^2, \quad \text{où $\bar{\x^2} = \frac{1}{\N}\sum \x_i^2$}$$
+
+Donc:
+
+$$\sigma^2 = \text{moyenne des carrés} - \text{carré de la moyenne}$$
+
+## Pourquoi élever au carré?
+
+Si on n'élevait pas les écarts au carré, les valeurs pourraient se compenser. Par exemple avec les observations suivantes $2, 3, 3, 4$
+
+- On a $\bar \x := \frac{\sum \x_i}{\N} = \frac{2+3+3+4}{4} = 12/4 = 3$
+
+Sans élever les écarts au carré, on trouverait:
+
+$$\sigma^2 = \frac{1}{\N}\sum (\x_i - \bar \x) = \frac{1}{4}\big((2-3) + (3-3) + (3-3) + (4-3)\big) = 0$$
+
+\dots et pourtant les observations n'ont pas toutes la même valeur
+
+
+## Le calcul de la variance d'échantillon
+
+En statistique inférentielle on corrige la variance par le facteur $\frac{\N}{\N-1}$. On obtient ainsi une variance dite d'**échantillon**
+
+En pratique, on applique les mêmes formules mais on divise par $\N-1$ plutôt que par $\N$
+
+
+
+1. Sur données brutes:
+
+$$ \s^2 = \frac{1}{\N-1}\sum (\x_i - \bar \x) ^2 $$
+
+2. Sur données traitées avec effectif:
+
+$$ \s^2 = \frac{1}{\N-1}\sum n_i(\x_i - \bar \x) ^2 $$
+
+3. Sur données traitées regroupées en classes :
+
+$$ \s^2 = \frac{1}{\N-1}\sum n_i(c_i - \bar \x) ^2 $$
+
+## L'écart-type
+
+- L'écart type est la racine carré de la variance que l'on note naturellement $\sigma$ ou $\s$ ($= \sqrt {\sigma^2}\text{ ou } \sqrt {\s^2}$)
+- Puisque qu'il existe une variance d'observation et d'échantillon, on calcule également un écart-type d'observation et un écart-type d'échantillon
+
+## Calcul de l'écart-type
+
+1. Sur données brutes:
+
+$$ \sigma = \sqrt{\frac{1}{\N}\sum (\x_i - \bar \x) ^2} \quad\text{ou}\quad \s =  \sqrt{\frac{1}{\N-1}\sum (\x_i - \bar \x) ^2} $$
+
+2. Sur données traitées avec effectif:
+
+$$ \sigma = \sqrt{\frac{1}{\N}\sum n_i(\x_i - \bar \x) ^2} \quad\text{ou}\quad \s =  \sqrt{\frac{1}{\N-1}\sum n_i(\x_i - \bar \x) ^2}  $$
+
+3. Sur données traitées regroupées en classes :
+
+$$ \sigma = \sqrt{\frac{1}{\N}\sum n_i(c_i - \bar \x) ^2} \quad\text{ou}\quad \s = \sqrt{\frac{1}{\N-1}\sum n_i(c_i - \bar \x) ^2} $$
+
+## Calcul de l'écart-type: remarques
+
+- Comme la variance, l'écart-type est strictement positif (attention aux calculs!)
+- Puisqu'il se déduit de la variance (par fonction croissante), l'écart-type est aussi une mesure de dispersion qui s'interprète de la même façon
+- L'écart-type est une mesure homogène aux données: si les observations sont des poids en kg, l'écart-type est aussi en kg
+- Étant données plusieurs distributions, on peut comparer les dispersions avec la valeur des écart-types... mais il faut prendre quelques précautions
+
+## Le coefficient de variation
+
+L'écart type est sensible à l'échelle des données. On utilise alors le coefficient de variation (noté $\cv$) pour le mettre à l'échelle. Il est définit par le pourcentage suivant:
+
+$$\cv = \frac{\s}{\bar \x}\times 100$$
+
+- Le $\cv$ est réservé aux distributions strictement positives
+- Le $\cv$ est une mesure d'**homogénéité** des données, plus il est faible, plus les données sont homogènes
+- En pratique si $\cv < 15\%$, on dit que les données sont homogènes
+- Le $\cv$ est très utile pour comparer des distributions avec des unités différentes et/ou avec des moyennes très éloignées
+
