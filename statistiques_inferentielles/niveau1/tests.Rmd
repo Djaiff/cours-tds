@@ -1,0 +1,102 @@
+---
+title: "Éléments de compréhension des statistiques"
+author: "Jeffery P."
+institute: "Doctorant au Laboratoire des Sciences du Numérique de Nantes (LS2N)"
+date: "2019"
+output:
+  beamer_presentation:
+    includes:
+      in_header: header.tex
+---
+
+## Rappels
+
+- Si le vrai écart-type est connu:
+$$\sqrt \N \frac{\bar \X_\N -\mu}{\sigma} \sim \Norm(0, 1)$$
+
+- Si l'écart-type est inconnu et $\N-1\geq 30$:
+
+$$\sqrt \N \frac{\bar \X_\N -\mu}{s} \sim \Norm(0, 1)$$
+
+## Rappels: approximation normale
+
+Si $\N$ est suffisamment grand on peut écrire l'approximation suivante:
+
+$$\bar \X_\N \sim \Norm(\mu, (\frac{\sigma}{\sqrt \N})^2)$$
+
+Où:
+$$\bar \X_\N \sim \Norm(\mu, (\frac{\s}{\sqrt \N})^2)$$
+
+
+__Et ça, c'est super important !__
+
+## Problématique en exemple: contexte
+
+\og On souhaite savoir si la vraie moyenne $\mu$ est différente de 7\fg
+
+On fait alors une hypothèse que l'on note par convention 
+$$\h_0: \mu = 7$$
+
+Tout l'enjeu est de savoir si les données sont **contradictoires**
+à cette hypothèse
+
+$\rightarrow$ si $\h_0$ est vraie, alors la moyenne empirique $\bar \x_\N$ 
+devrait être assez proche de 7
+
+## Problématique en exemple: formulation des hypothèses
+
+En fonction de ce qu'on veut tester, on peut formuler 3 types d'hypothèses 
+alternatives que l'on note $\h_1$:
+
+Cas 1: test **bilatéral**
+
+$$\h_0: \mu = 7 \quad \text{contre}\quad \h_1: \mu \ne 7$$
+
+Cas 2: test **unilatéral**
+$$\h_0: \mu = 7 \quad \text{contre}\quad \h_1: \mu > 7$$
+
+Cas 3: test **unilatéral**
+$$\h_0: \mu = 7 \quad \text{contre}\quad \h_1: \mu < 7$$
+
+## Problématique en exemple: construction du test pour le cas 1
+
+
+$$\text{Cas 1:}\qquad \h_0: \mu = 7 \quad \text{contre}\quad \h_1: \mu \ne 7$$
+
+Étant donné l'hypothèse alternative $\h_1$ et pour un seuil $\alpha$ donné, 
+on regarde alors si:
+
+
+$$|\sqrt \N \frac{\bar \X_\N -7}{s}| > \z_{(1-\alpha/2)} \quad ? $$
+
+- oui: on rejette $\h_0$ au profit de $\h_1$ au seuil  $\alpha$
+- non: on ne peut pas rejeter $\h_0$ au profit de $\h_1$ au seuil $\alpha$
+
+
+## Problématique en exemple: construction du test pour le cas 2
+
+$$\text{Cas 2:}\qquad \h_0: \mu = 7 \quad \text{contre}\quad \h_1: \mu > 7$$
+
+
+Étant donné l'hypothèse alternative $\h_1$ et pour un seuil $\alpha$ donné, 
+on regarde alors si:
+
+
+$$\sqrt \N \frac{\bar \X_\N -7}{s} > \z_{(1-\alpha)} \quad ?$$
+
+- oui: on rejette $\h_0$ au profit de $\h_1$ au seuil  $\alpha$
+- non: on ne peut pas rejeter $\h_0$ au profit de $\h_1$ au seuil $\alpha$
+
+## Problématique en exemple: construction du test pour le cas 3
+
+$$\text{Cas 3:}\qquad \h_0: \mu = 7 \quad \text{contre}\quad \h_1: \mu < 7$$
+
+
+Étant donné l'hypothèse alternative $\h_1$ et pour un seuil $\alpha$ donné, 
+on regarde alors si:
+
+
+$$\sqrt \N \frac{\bar \X_\N -7}{s} <  -\z_{(1-\alpha)} \quad ?$$
+
+- oui: on rejette $\h_0$ au profit de $\h_1$ au seuil  $\alpha$
+- non: on ne peut pas rejeter $\h_0$ au profit de $\h_1$ au seuil $\alpha$

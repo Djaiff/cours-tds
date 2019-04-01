@@ -347,3 +347,7 @@ $n_i$         | 5             | 2            |  5
 ```{r child="IC.Rmd"}
 ```
 
+# Brève introduction aux tests
+
+```{r child="tests.Rmd"}
+```
