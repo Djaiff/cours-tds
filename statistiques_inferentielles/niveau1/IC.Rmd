@@ -173,7 +173,7 @@ $$P \underset{n\to \infty}{\longrightarrow}
 
 En pratique, on vérifie les conditions suivantes:
 
-- $\N\geq 3$,
+- $\N\geq 30$
 - $\N\times p \geq 5$
 - $\N\times (1-p) \geq 5$
 
