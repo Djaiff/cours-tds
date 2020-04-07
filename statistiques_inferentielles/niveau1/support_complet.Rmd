@@ -2,7 +2,7 @@
 title: "Éléments de compréhension des statistiques"
 author: "Jeffery P."
 institute: "Doctorant au Laboratoire des Sciences du Numérique de Nantes (LS2N)"
-date: "2019"
+date: "2020"
 output: 
   beamer_presentation:
     includes:
@@ -98,8 +98,8 @@ Pour chacun de ces deux grands types, il existe deux sous-catégories...
 
 Peut-on ordonner (hiérarchiser) les modalités ?
 
-- oui: il s'agit d'une variable **qualitative ordinale** (e.g., type de logement {appartement/maison})
-- non: il s'agit d'une variable **qualitative nominale** (e.g., fréquentation {rare < occasionnelle < souvent})
+- oui: il s'agit d'une variable **qualitative ordinale** (e.g., fréquentation {rare < occasionnelle < souvent})
+- non: il s'agit d'une variable **qualitative nominale** (e.g., type de logement {appartement/maison})
 
 ## Les variables quantitatives
 

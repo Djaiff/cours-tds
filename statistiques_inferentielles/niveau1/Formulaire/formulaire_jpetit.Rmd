@@ -1,0 +1,239 @@
+---
+title: Formulaire de statistiques
+author:
+  - name: Jeffery Petit
+    affiliation: Laboratoire des Sciences du Numérique de Nantes (LS2N)
+    address:
+    - École Centrale Nantes
+    email:  jeffery.petit@ls2n.fr
+abstract: >
+  Définitions et propriétés utiles à destination des étudiants de L1 Psycho à l'université de Nantes. Ce formulaire contient uniquement l'essentiel : pas de graphique, peu de blabla. Le formalisme utilisé, parfois plus complexe que le document de cours officiel, n'est pas indispensable. Ce document ne sera pas autorisé à l'examen.
+preamble: |
+  % Any extra LaTeX you need in the preamble
+  \usepackage[french]{babel}
+  \usepackage{amsmath}
+  \usepackage{amsfonts}
+  \usepackage{systeme}
+  \usepackage{xcolor}
+  \newcommand*{\Prob}{\mathbb P}
+  \newcommand*{\N}{\mathcal N}
+  \newtheorem{myprop}{Propriété}
+  \newtheorem{mydef}{Définition}
+  \parindent 0cm
+output: rticles::rjournal_article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+```
+
+# Formules usuelles de probabilité
+
+Les formules qui vont suivre s'appliquent à une variable $Z\sim \N(\mu = 0, \sigma = 1)$.
+
+
+
+\begin{myprop}[Symétrie de la loi normale]
+
+On suppose que $a$ est un nombre réel quelconque :
+
+\begin{equation}
+\Prob(Z>a) = 1 - \Prob(Z<a)
+\end{equation}
+
+\begin{equation}
+\Prob(Z<-a) = \Prob(Z>a)
+\end{equation}
+
+\end{myprop}
+
+\begin{myprop}[Probabilités des intervalles]
+
+Supposons que $b$ et $c$ soient des nombres réels quelconques tels que $b<c$ :
+
+\begin{equation}
+\Prob(b<Z<c) = \Prob(Z<c) - \Prob(Z<b)
+\end{equation}
+
+\end{myprop}
+
+Par conséquent, si l'on suppose  que $d$ est un nombre réel positif : 
+
+\begin{equation}
+\Prob(-d<Z<d) = 2\times\Prob(Z<d) - 1
+\end{equation}
+
+# Normalisation
+
+
+\begin{myprop}[Normalisation]
+
+Le calcul de probabilté et de quantile nécessite de toujours se ramener au cas d'une varaible suivant une loi normale dite \textbf{centrée, réduite}, i.e. une loi $\N(0,1)$. Pour ce faire, on utilisera fréquemment la propriété suivante:
+
+\begin{equation} 
+X\sim\mathcal N(\mu, \sigma) \Rightarrow Z = \frac{X-\mu}{\sigma} \sim \mathcal N(0,1)
+\label{regledor}
+\end{equation}
+
+\end{myprop}
+
+
+# Quantiles
+
+
+\begin{mydef}[Notation de quantiles]
+
+Soit X une variable aléatoire de loi continue, on appelle quantile d'ordre $\alpha$, et on note $q_\alpha$ la valeur vérifiant :
+
+\begin{equation}
+\mathbb P(X<q_\alpha) = \alpha \Longleftrightarrow \mathbb P(X>q_\alpha) = 1 - \alpha
+\label{quant}
+\end{equation}
+
+Par convention, lorsqu'on travaille sur une loi normale centrée réduite, e.g. $Z\sim \N(0,1)$, les quantiles sont notés $z_\alpha$, i.e. $\Prob(Z<z_\alpha) = \alpha$
+\end{mydef}
+
+\begin{myprop}[Symétrie des quantile pour la loi $\N(0,1)$]
+
+Supposons que $z_\alpha$ soit le quantile d'ordre $\alpha$ de la loi $\N(0,1)$
+
+\begin{equation}
+z_\alpha = \textcolor{red}{-} z_{\textcolor{red}{1-}\alpha} \Longleftrightarrow   z_{\textcolor{red}{1-}\alpha} = \textcolor{red}{-} z_\alpha
+\end{equation}
+\end{myprop}
+
+\begin{myprop}[Calcul des quantiles pour une loi quelconque $\N(\mu,\sigma)$]
+Supposons que $q_\alpha$ soit le quantile d'ordre $\alpha$ de la loi $\N(\mu, \sigma)$ et que $z_\alpha$ soit le quantile d'ordre $\alpha$ de la loi $\N(0,1)$. On a alors :
+
+\begin{equation}
+q_\alpha = \mu + \sigma \times z_\alpha
+\end{equation}
+\end{myprop}
+
+# Intervalles de confiance
+
+\begin{mydef}[Définition d'un IC pour une moyenne $\mu$ ou une proportion $p_0$]
+
+On appelle \og Intervalle de Confiance (IC) de niveau $1-\alpha$ pour la moyenne $\mu$ \fg{} et on note $IC_{1-\alpha}(\mu)$ (resp. $IC_{1-\alpha}(p_0)$), un intervalle qui a une probabilité $1-\alpha$ de contenir la vraie valeur de $\mu$ (resp. $p_0$).
+
+$\longrightarrow \alpha$ est souvent appelé \textbf{seuil} ou \textbf{niveau de risque} de l'IC.
+\end{mydef}
+
+De manière générale, un IC bilatéral pour une moyenne (resp. une proportion) sera définit ainsi $IC_{1-\alpha}(\mu) = [\bar x \pm \varepsilon_\alpha]$ (resp. $IC_{1-\alpha}(p_0) = [p \pm \varepsilon_\alpha]$) où $\varepsilon_\alpha$ sera la marge d'erreur à calculer pour un risque donné.
+
+\begin{myprop}[Formule des écart-types]
+\begin{equation}
+s = \sqrt{\frac{N}{N-1}} \times \sigma
+\end{equation}
+\end{myprop}
+
+## IC bilatéral pour une moyenne $\mu$
+
+\textcolor{gray}{\emph{Dans ce qui suit on suppose que l'on dispose d'un échantillon dont la distribution est une loi normale. On note $N$ l'effectif de cet échantillon, $\bar x$ la moyenne observée sur l'échantillon, $\sigma$ l'écart-type d'observation et $s$ l'écart-type d'échantillon.}}
+
+\begin{mydef}[Marge d'erreur si $N < 30$] La marge d'erreur pour un seuil $\alpha$ que l'on peut noter $\varepsilon_\alpha$ est la quantité suivante :
+
+\begin{equation}
+\varepsilon_\alpha = \frac{s}{\sqrt N} \times t_{1-\frac{\alpha}{2}}
+\end{equation}
+
+Où $t_{1-\frac{\alpha}{2}}$ est le quantile d'ordre $1-\frac{\alpha}{2}$ de la loi de Student à $N-1$ degrés de liberté (ddl).
+\end{mydef}
+
+\begin{myprop}[Condition sur N si $N < 30$]
+Supposons que l'on cherche la valeur de $N$ à partir de laquelle on obtient une marge d'erreur plus faible qu'un certain $\varepsilon$ au seuil $\alpha$. La condition que $N$ doit alors vérifier est :
+
+\begin{equation}
+N\geq (\frac{s}{\varepsilon} \times t_{1-\frac{\alpha}{2}})^2
+\end{equation}
+
+\end{myprop}
+
+
+\begin{mydef}[IC si $N < 30$] 
+
+\begin{equation}
+\begin{array}{rcl}
+IC_{1-\alpha}(\mu) &=& [\bar x \pm \varepsilon_\alpha]\\
+                   &=& [\bar x - \varepsilon_\alpha; \bar x + \varepsilon_\alpha]\\
+                   &=& [\bar x - \frac{s}{\sqrt N} \times t_{1-\frac{\alpha}{2}}; \bar x + \frac{s}{\sqrt N} \times t_{1-\frac{\alpha}{2}}]\\
+\end{array}
+\end{equation}
+
+\end{mydef}
+
+\begin{mydef}[Marge d'erreur si $N \geq 30$] La marge d'erreur pour un seuil $\alpha$ que l'on peut noter $\varepsilon_\alpha$ est la quantité suivante :
+
+\begin{equation}
+\varepsilon_\alpha = \frac{s}{\sqrt N} \times z_{1-\frac{\alpha}{2}}
+\end{equation}
+
+Où $z_{1-\frac{\alpha}{2}}$ est le quantile d'ordre $1-\frac{\alpha}{2}$ de la loi normale $\N(0,1)$.
+\end{mydef}
+
+\begin{myprop}[Condition sur N si $N \geq 30$]
+Supposons que l'on cherche la valeur de $N$ à partir de laquelle on obtient une marge d'erreur plus faible qu'un certain $\varepsilon$ au seuil $\alpha$. La condition que $N$ doit alors vérifier est :
+
+\begin{equation}
+N\geq (\frac{s}{\varepsilon} \times z_{1-\frac{\alpha}{2}})^2
+\end{equation}
+\end{myprop}
+
+\begin{mydef}[IC si $N \geq 30$] 
+
+\begin{equation}
+\begin{array}{rcl}
+IC_{1-\alpha}(\mu) &=& [\bar x \pm \varepsilon_\alpha]\\
+                   &=& [\bar x - \varepsilon_\alpha; \bar x + \varepsilon_\alpha]\\
+                   &=& [\bar x - \frac{s}{\sqrt N} \times z_{1-\frac{\alpha}{2}}; \bar x + \frac{s}{\sqrt N} \times z_{1-\frac{\alpha}{2}}]\\
+\end{array}
+\end{equation}
+
+\end{mydef}
+
+## IC bilatéral pour une proportion $p_0$
+
+\textcolor{gray}{\emph{Dans ce qui suit on note $p$ la proportion observée dans l'échantillon.}}
+
+\textbf{Conditions indispensables}
+
+$$N \geq 30$$
+
+$$N \times p \geq 5$$
+
+$$N \times (1-p) \geq 5$$
+
+\begin{mydef}[Marge d'erreur pour une proportion] La marge d'erreur pour un seuil $\alpha$ que l'on peut noter $\varepsilon_\alpha$ est la quantité suivante :
+
+\begin{equation}
+\varepsilon_\alpha = \sqrt{\frac{p(1-p)}{N}} \times z_{1-\frac{\alpha}{2}}
+\end{equation}
+
+Où $z_{1-\frac{\alpha}{2}}$ est le quantile d'ordre $1-\frac{\alpha}{2}$ de la loi normale $\N(0,1)$.
+\end{mydef}
+
+\begin{myprop}[Condition sur $N$ pour une proportion]
+Supposons que l'on cherche la valeur de $N$ à partir de laquelle on obtient une marge d'erreur plus faible qu'un certain $\varepsilon$ au seuil $\alpha$. La condition que $N$ doit alors vérifier est :
+
+\begin{equation}
+N\geq (\frac{z_{1-\frac{\alpha}{2}}}{\varepsilon} )^2 \times p(1-p)
+\end{equation}
+\end{myprop}
+
+
+\begin{mydef}[IC pour une proportion]
+
+\begin{equation}
+\begin{array}{rcl}
+IC_{1-\alpha}(p_0) &=& [p \pm \varepsilon_\alpha]\\
+                   &=& [p - \varepsilon_\alpha; \bar x + \varepsilon_\alpha]\\
+                   &=& [p - \sqrt{\frac{p(1-p)}{N}} \times z_{1-\frac{\alpha}{2}}; p + \sqrt{\frac{p(1-p)}{N}} \times z_{1-\frac{\alpha}{2}}]\\
+\end{array}
+\end{equation}
+
+\bigskip
+
+\color{red}\underline{Remarque:} attention, l'IC s'exprime soit en pourcentage, soit en décimal. Par exemple, pour une proportion de 52.94\% soit on calcul l'IC en posant $p = 52.94$, soit en posant $p=0.5294$ mais il ne faut pas mélanger les deux !
+
+\end{mydef}
